@@ -1,17 +1,17 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const urlencodedParser = bodyParser.urlencoded({extended: false});
 const app = express();
 const apiKey = process.env.MAPKEY;
 const googleMapsClient = require('@google/maps').createClient({
   key: apiKey
 });
-console.log(apiKey);
 
 app.get('/favicon.ico', (req, res) => { //disable favicon
   res.sendStatus(204);
 });
 
-app.get('/', (req, res) => {
+app.get('/',urlencodedParser ,(req, res) => {
   googleMapsClient.geocode({
     address: '1600 Amphitheatre Parkway, Mountain View, CA'
   }, function(err, res) {
