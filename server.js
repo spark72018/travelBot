@@ -24,12 +24,16 @@ app.get('/', (req, res) => {
       address: '1600 Amphitheatre Parkway, Mountain View, CA'
     }, (err, response) {
       if(!err) {
-        console.log(response.json.results);
-        res.send(response.json.results);
+        resolve(response.json.results);
       }else {
         console.log('error occurred, ', err);
       }
     });
+  });
+
+  mapPromise.then(function(val) {
+    console.log(val);
+    res.send(val);
   });
 });
 
