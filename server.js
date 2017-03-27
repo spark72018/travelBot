@@ -8,14 +8,7 @@ const express = require('express'),
   key: apiKey
 }),
 
-var validator = (functino() {
-  var isEqual = function(p1, p2) {
-    return p1 === p2;
-  };
-  return {
-    isEqual: isEqual
-  };
-})();
+const isEqual = (p1, p2) => p1 === p2;
 
 /*
 app.post('/slack/map', urlencodedParser, (req, res) => {
