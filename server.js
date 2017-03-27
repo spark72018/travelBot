@@ -7,7 +7,7 @@ const googleMapsClient = require('@google/maps').createClient({
 });
 console.log(apiKey);
 
-app.get('/favicon.ico', (req, res) { //disable favicon
+app.get('/favicon.ico', (req, res) => { //disable favicon
   res.sendStatus(204);
 });
 
