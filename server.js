@@ -9,7 +9,9 @@ const express = require('express'),
 }),
 
 var validator = (function() {
-  var isEqual = (p1, p2) => p1 === p2;
+  var isEqual = function(p1, p2) {
+    return p1 === p2;
+  };
 
   return {
     isEqual: isEqual
