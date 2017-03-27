@@ -16,7 +16,8 @@ app.get('/', (req, res) => {
     address: '1600 Amphitheatre Parkway, Mountain View, CA'
   }, function(err, res) {
     if(!err) {
-      res.send(response.json.results);
+      console.log(res.json.results);
+      res.send(res.json.results);
     }else {
       console.log('error occurred: ', err);
     }
