@@ -1,4 +1,4 @@
-const express = require('express'),
+var express = require('express'),
       bodyParser = require('body-parser'),
       urlencodedParser = bodyParser.urlencoded({extended: false}),
       app = express(),
@@ -13,27 +13,16 @@ app.post('/slack/map', urlencodedParser, (req, res) => {
 
 });
 */
-
-app.get('/favicon.ico', (req, res) => { //disable favicon
-  res.sendStatus(204);
-});
-
-app.get('/', (req, res) => {
-  let mapPromise = new Promise((resolve, reject) => {
-    googleMapsClient.geocode({
-      address: '1600 Amphitheatre Parkway, Mountain View, CA'
-    }, (err, response) {
-      if(!err) {
-        resolve(response.json.results);
-      }else {
-        console.log('error occurred, ', err);
-      }
-    });
-  });
-
-  mapPromise.then(function(val) {
-    console.log(val);
-    res.send(val);
+app.get(/, function(req, res) {
+  googleMapsClient.geocode({
+    address: '1600 Amphitheatre Parkway, Mountain View, CA'
+  }, function(err, response) {
+    if(!err) {
+      console.log(response.json.results);
+      res.send(response.json.results);
+    }else {
+      console.log(err);
+    }
   });
 });
 
