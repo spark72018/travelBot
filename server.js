@@ -13,7 +13,7 @@ app.post('/slack/map', urlencodedParser, (req, res) => {
 
 });
 */
-app.get(/, function(req, res) {
+app.get('/', function(req, res) {
   googleMapsClient.geocode({
     address: '1600 Amphitheatre Parkway, Mountain View, CA'
   }, function(err, response) {
