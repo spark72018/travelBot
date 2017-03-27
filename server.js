@@ -6,9 +6,15 @@ const express = require('express'),
       slackToken = process.env.SLACKTOKEN,
       googleMapsClient = require('@google/maps').createClient({
   key: apiKey
-}),
+});
 
-const isEqual = (p1, p2) => p1 === p2;
+const validator = (() => {
+  let isEqual = (p1, p2) => p1 === p2;
+
+  return {
+    isEqual: isEqual
+  }
+})();
 
 /*
 app.post('/slack/map', urlencodedParser, (req, res) => {
