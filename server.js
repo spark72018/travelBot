@@ -8,11 +8,10 @@ const express = require('express'),
   key: apiKey
 }),
 
-var validator = (function() {
+var validator = (functino() {
   var isEqual = function(p1, p2) {
     return p1 === p2;
   };
-
   return {
     isEqual: isEqual
   };
