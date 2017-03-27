@@ -8,7 +8,7 @@ const express = require('express'),
   key: apiKey
 }),
 
-const validator = (() => {
+var validator = (() => {
   let isEqual = (p1, p2) => p1 === p2;
 
   return {
