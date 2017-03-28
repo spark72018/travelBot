@@ -20,7 +20,7 @@ app.get('/', function(req, res) {
   }, function(err, response) {
     if(!err) {
       console.log(response.json.results);
-      res.set('Access-Control-Allow-Origin', 'https://spark72018.github.io/googleTest/');
+      res.setHeader('Access-Control-Allow-Origin', req.headers.origin);
       res.send(response.json.results);
     }else {
       console.log(err);
