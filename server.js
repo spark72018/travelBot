@@ -109,6 +109,7 @@ app.get('/', function(req, res) {
   }).asPromise()
   .then(function(response) {
     console.log(response.json);
+    res.setHeader('Access-Control-Allow-Origin', req.headers.origin);
     res.send(response.json);
   });
 
