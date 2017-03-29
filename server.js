@@ -8,32 +8,6 @@ var express = require('express'),
       key: apiKey
     });
 
-/*
-app.post('/slack/map', urlencodedParser, (req, res) => {
-
-});
-*/
-//maps.google.com/?q=
-
-/*
--if only one input
-  -get geocoords
-  -generate static image
-
-/address from: (pointA) to: (pointB)
-
-*/
-
-//https://maps.googleapis.com/maps/api/staticmap?
-
-/*
--user validation of address
-  -notify user if not valid address
-
-userInp.replace(/\s/g, "+");
-
-*/
-
 //https://tranquil-harbor-42592.herokuapp.com/
 var isEqual = function(p1, p2) {
     return p1 === p2;
