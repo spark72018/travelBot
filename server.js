@@ -108,8 +108,8 @@ app.get('/', function(req, res) {
     destination: {lat: 40.8425820, lng: -73.7171510 }
   }).asPromise()
   .then(function(response) {
-    console.log(response.json.results);
-    res.send(response.json.results);
+    console.log(response);
+    res.send(response);
   });
 
 });
