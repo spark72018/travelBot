@@ -3,7 +3,7 @@ var express = require('express'),
     urlencodedParser = bodyParser.urlencoded({extended: false}),
     app = express(),
     apiKey = process.env.MAPKEY,
-    slackToken = process.env.SLACKTOKEN,
+    slackEnvToken = process.env.SLACKTOKEN,
     googleMapsClient = require('@google/maps').createClient({
       key: apiKey
     });
@@ -30,7 +30,7 @@ app.get('/', function(req, res) {
 });
 
 app.post('/slack/hello', urlencodedParser, function(req, res) {
-    if(isEqual(req.body.token, envToken)) {
+    if(isEqual(req.body.token, slackEnvToken)) {
         res.send({
             'response_type': 'in_channel',
             'text': "Hello there!"
