@@ -103,12 +103,12 @@ app.listen(process.env.PORT || 3000);
 
 app.get('/', function(req, res) {
   googleMapsClient.directions({
-    origin: [40.7720280, -73.4974010],
-    destination: [40.8425820, -73.7171510]
+    origin: { lat: 40.7720280, lng: -73.4974010},
+    destination: { lat: 40.8425820, lng: -73.7171510]
   }, function(err, response) {
     if(!err) {
-      res.send(response.json.results);
-      console.log(response.json.results);
+      res.send(response);
+      console.log(response);
     }else {
       console.log(err);
     }
