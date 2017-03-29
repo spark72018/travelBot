@@ -62,7 +62,7 @@ app.post('/slack/inspire', urlencodedParser, function(req, res) {
         });
     });
     myPromise.then(function(quoteData) {
-        if(isEqual(req.body.token, envToken)) {
+        if(isEqual(req.body.token, slackEnvToken)) {
             var formattedQuote = replacer(quoteData[0].content, {
                 '<p>|<\/p>': '',
                 '&#8217;': '\'',
