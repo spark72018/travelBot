@@ -106,7 +106,7 @@ app.get('/', function(req, res) {
   googleMapsClient.directions({
     origin: { lat: 40.7720280, lng: -73.4974010 },
     destination: {lat: 40.8425820, lng: -73.7171510 }
-  }, function(err, response.json.results) {
+  }, function(err, response) {
     if(!err) {
       res.send(response.json.results);
       console.log(response.json.results);
