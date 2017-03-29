@@ -5,7 +5,8 @@ var express = require('express'),
     apiKey = process.env.MAPKEY,
     slackEnvToken = process.env.SLACKTOKEN,
     googleMapsClient = require('@google/maps').createClient({
-      key: apiKey
+      key: apiKey,
+      Promise: Promise
     });
 
 /*
@@ -83,7 +84,7 @@ app.post('/slack/inspire', urlencodedParser, function(req, res) {
 });
 */
 
-/*
+
 app.get('/', function(req, res) {
   googleMapsClient.geocode({
     address: '1600 Amphitheatre Parkway, Mountain View, CA'
@@ -99,8 +100,8 @@ app.get('/', function(req, res) {
 });
 
 app.listen(process.env.PORT || 3000);
-*/
 
+/*
 app.get('/', function(req, res) {
   googleMapsClient.directions({
     origin: { lat: 40.7720280, lng: -73.4974010 },
@@ -112,3 +113,4 @@ app.get('/', function(req, res) {
     }
   });
 });
+*/
