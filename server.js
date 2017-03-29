@@ -8,6 +8,7 @@ var express = require('express'),
       key: apiKey
     });
 
+/*
 //https://tranquil-harbor-42592.herokuapp.com/
 var isEqual = function(p1, p2) {
     return p1 === p2;
@@ -80,11 +81,9 @@ app.post('/slack/inspire', urlencodedParser, function(req, res) {
         }
     });
 });
+*/
 
-app.listen(process.env.PORT || 8080, function() {
-    console.log('Listening on port ', process.env.PORT + '!');
-});
-
+/*
 app.get('/', function(req, res) {
   googleMapsClient.geocode({
     address: '1600 Amphitheatre Parkway, Mountain View, CA'
@@ -100,3 +99,18 @@ app.get('/', function(req, res) {
 });
 
 app.listen(process.env.PORT || 3000);
+*/
+
+app.get('/', function(req, res) {
+  googleMapsClient.directions({
+    origin: [40.7720280, -73.4974010],
+    destination: [40.8425820, -73.7171510]
+  }, function(err, response) {
+    if(!err) {
+      res.send(response.json.results);
+      console.log(response.json.results);
+    }else {
+      console.log(err);
+    }
+  });
+});
