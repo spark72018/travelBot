@@ -131,10 +131,18 @@ if (cmd.split(">").length === 1) {
 //attachmentInput is an array of objects, debating whether to write
 //argument validation in function body, leaning towards not
 var botStore = function(textInput, attachmentInput) {
-  var store = {
-    'text': textInput,
-    'attachments': attachmentInput
-  };
+  var store,
+      argsLength = arguments.length;
+  if(argsLength === 2) {
+    store = {
+      'text': arguments[0],
+      'attachments': arguments[1]
+    };
+  }else {
+    store = {
+      'text': arguments[0]
+    };
+  }
   return {
     response: function() {
       return store;
