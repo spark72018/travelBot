@@ -143,8 +143,11 @@ var botStore = function(textInput, attachmentInput) {
 };
 
 example usage:
-var ourBot = botStore("THIS\nIS\nSPARTA", [{image_url: img}]);
-ourBot.response();
+var ourBot = botStore("THIS\nIS\nSPARTA", [{image_url: 'some url link'}]);
+console.log(ourBot.response()); //will output Object
+                                              attachments: Array[1]
+                                              text: "THIS↵IS↵SPARTA"
+                                              __proto__: Object
 */
 
 /*initial attempt at getting user input and doing stuff with it
