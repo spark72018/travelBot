@@ -138,9 +138,13 @@ var botStore = function(textInput, attachmentInput) {
       'text': arguments[0],
       'attachments': arguments[1]
     };
-  }else {
+  }else if(typeof arguments[0] === 'string') {
     store = {
       'text': arguments[0]
+    };
+  }else {
+    store = {
+      'attachments' : arguments[0]
     };
   }
   return {
