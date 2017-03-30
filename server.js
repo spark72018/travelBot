@@ -157,8 +157,10 @@ app.get('/someCommand', function(req, res) {
     //steve's  else code here
       //googleMapsClient.geocode code here, then
       //process geocode with googleMapsClient.directions code here
-        //figure out how to process google's directions response, use my
-        //replacer function from slack quote command (not sure)
+        //cache response.routes[0].legs into variable (one time object lookup)
+        //response.routes[0].legs.steps --> array containing actual route steps
+          //figure out how to process google's directions response, use my
+          //replacer function from slack quote command (not sure)
   //var ourBot = botStore(directions, image);
   //var ourResponse = ourBot.response();
   //res.send(ourResponse);
