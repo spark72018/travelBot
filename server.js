@@ -118,8 +118,50 @@ if (cmd.split(">").length === 1) {
         image_url: img;
       }
     ]
-  }); 
+  });
 } else {}
+*/
+
+/*
+//we can input appropriate responses, will return response object
+
+//also, if we want to send error text, just put our error message
+//into textInput param
+
+//attachmentInput is an array of objects, debating whether to write
+//argument validation in function body, leaning towards not
+var botStore = function(textInput, attachmentInput) {
+  var store = {
+    'text': textInput,
+    'attachments': attachmentInput
+  };
+  return {
+    response: function() {
+      return store;
+    }
+  };
+};
+
+example usage:
+var ourBot = botStore("THIS\nIS\nSPARTA", [{image_url: img}]);
+ourBot.response();
+*/
+
+/*initial attempt at getting user input and doing stuff with it
+app.get('/someCommand', function(req, res) {
+  //cache appropriate lookups here?
+    //valerie's if block code here
+    //steve's  else code here
+      //googleMapsClient.geocode code here, then
+      //process geocode with googleMapsClient.directions code here
+        //figure out how to process google's directions response, use my
+        //replacer function from slack quote command (not sure)
+  //var ourBot = botStore(directions, image);
+  //var ourResponse = ourBot.response();
+  //res.send(ourResponse);
+
+});
+
 */
 
 app.get('/', function(req, res) {
