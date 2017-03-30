@@ -102,6 +102,26 @@ app.get('/', function(req, res) {
 app.listen(process.env.PORT || 3000);
 */
 
+
+//Start of if block (static image part)
+/*
+var cmd = req.body.text;
+if (cmd.split(">").length === 1) {
+  cmd = cmd.replace(\/s\g, '+');
+
+  var img = "https://maps.googleapis.com/maps/api/staticmap?center="+cmd+"&size=600x400&markers="+cmd;
+
+  res.send({
+    response_type: 'in_channel',
+    attachments:[
+      {
+        image_url: img;
+      }
+    ]
+  }); 
+} else {}
+*/
+
 app.get('/', function(req, res) {
   googleMapsClient.directions({
     origin: { lat: 40.7720280, lng: -73.4974010 },
