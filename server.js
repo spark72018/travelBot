@@ -108,14 +108,15 @@ app.listen(process.env.PORT || 3000);
 var cmd = req.body.text;
 if (cmd.split(">").length === 1) {
   cmd = cmd.replace(\/s\g, '+');
-
-  var img = "https://maps.googleapis.com/maps/api/staticmap?center="+cmd+"&size=600x400&markers="+cmd;
+  var url = "https://maps.googleapis.com/maps/api/staticmap?center="+cmd+"&size=600x400&markers="+cmd;
 
   res.send({
     response_type: 'in_channel',
+    "title": "cmd",
+    "title_link": "url",
     attachments:[
       {
-        image_url: img;
+        image_url: url;
       }
     ]
   });
