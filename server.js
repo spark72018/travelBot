@@ -106,21 +106,28 @@ app.listen(process.env.PORT || 3000);
 //Start of if block (serves static image when user enters 1 input)
 /*
 var cmd = req.body.text;
-if (cmd.split(">").length === 1 && cmd.test("\\d+\\s+([a-zA-Z]+|[a-zA-Z]+\\s[a-zA-Z]+)")) {
-  cmd = cmd.replace(\/s\g, '+');
-  var url = "https://maps.googleapis.com/maps/api/staticmap?center="+cmd+"&size=600x400&markers="+cmd;
+if (cmd.split(">").length === 1) {
+  if (cmd.test("\\d+\\s+([a-zA-Z]+|[a-zA-Z]+\\s[a-zA-Z]+)") {
+    cmd = cmd.replace(\/s\g, '+');
+    var url = "https://maps.googleapis.com/maps/api/staticmap?center="+cmd+"&size=600x400&markers="+cmd;
 
-  res.send({
-    response_type: 'in_channel',
-    "title": "cmd",
-    "title_link": "url",
-    attachments:[
-      {
-        image_url: url;
-      }
-    ]
-  });
-} else {}
+    res.send({
+      response_type: 'in_channel',
+      "title": "cmd",
+      "title_link": "url",
+      attachments:[
+        {
+          image_url: url;
+        }
+      ]
+    });
+  } else {
+    res.send({
+      response_type: 'in_channel',
+      "text": "Enter a valid address!",
+    });
+  }
+} else {Steve's part}
 */
 
 /*
