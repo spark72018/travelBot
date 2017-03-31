@@ -103,10 +103,10 @@ app.listen(process.env.PORT || 3000);
 */
 
 
-//Start of if block (static image part)
+//Start of if block (serves static image when user enters 1 input)
 /*
 var cmd = req.body.text;
-if (cmd.split(">").length === 1) {
+if (cmd.split(">").length === 1 && cmd.test("\\d+\\s+([a-zA-Z]+|[a-zA-Z]+\\s[a-zA-Z]+)")) {
   cmd = cmd.replace(\/s\g, '+');
   var url = "https://maps.googleapis.com/maps/api/staticmap?center="+cmd+"&size=600x400&markers="+cmd;
 
