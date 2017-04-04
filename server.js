@@ -1,6 +1,6 @@
 var express = require('express'),
     bodyParser = require('body-parser'),
-    urlencodedParser = bodyParser.urlencoded({extended: false}),
+    //urlencodedParser = bodyParser.urlencoded({extended: false}),
     app = express(),
     apiKey = process.env.MAPKEY,
     slackEnvToken = process.env.SLACKTOKEN,
@@ -9,8 +9,12 @@ var express = require('express'),
       Promise: Promise
     });
 
+app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.json());
+
 //Start of if block (serves static image when user enters 1 input)
 
+/*
 app.get('/', function(req, res) {
   var cmd = req.body.text;
   if (cmd.split(">").length === 1) {
@@ -38,7 +42,7 @@ app.get('/', function(req, res) {
 
   }
 }
-
+*/
 
 
 /*
@@ -80,31 +84,38 @@ var botStore = function(textInput, attachmentInput) {
 
 //need to add token validation
 //need to add valerie's address validation
-app.post('/directions', urlencodedParser, function(req, res) {
+app.post('/directions', function(req, res) {
+  /*
   var splitted = req.body.text.split('>'),
       splittedLength = splitted.length,
       directionsString = '',
       start, //starting geocode
       finish; //finishing geocode
-
+*/
 //valerie's if block first (static map)
 //steve's else block second (directions)
 // '/dirMap' for integrated response?
 var cmd = req.body.text;
-if (cmd.split(">").length === 1) {
-  var formattedInput = cmd.replace(\/s\g, '+');
-  var url = "https://maps.googleapis.com/maps/api/staticmap?center="+formattedInput+"&size=600x400&markers="+formattedInput;
+var regex = /\d+\s+([a-zA-Z]+|[a-zA-Z]+\s[a-zA-Z]+)/g;
+console.log(cmd);
+if (regex.test(cmd)) {
+  if(cmd.split(">").length === 1) {
+    var formattedInput = cmd.replace(/\s/g, '+');
+    console.log('this is formattedInput ' + formattedInput);
+    var url = "https://maps.googleapis.com/maps/api/staticmap?center="+formattedInput+"&size=600x400&markers="+formattedInput;
 
-  res.send({
-    response_type: 'in_channel',
-    "title": cmd,
-    "title_link": url,
-    attachments:[
-      {
-        image_url: url;
-      }
-    ]
-  });
+    res.send({
+      response_type: 'in_channel',
+      "title": cmd,
+      "title_link": url,
+      attachments:[
+        {
+          image_url: url
+        }
+      ]
+    });
+  }
+}
   /*
   if (cmd.test("\\d+\\s+([a-zA-Z]+|[a-zA-Z]+\\s[a-zA-Z]+")) {
   } else {
@@ -117,7 +128,7 @@ if (cmd.split(">").length === 1) {
 
 }
 */
-}
+
 /*
   //timestamp console.log to easily discern app startup in heroku logs
   console.log(new Date().toLocaleString());
