@@ -10,9 +10,9 @@ var express = require('express'),
     });
 
 //Start of if block (serves static image when user enters 1 input)
-/*
+
 app.get('/', function(req, res) {
-  var input = req.body.text;
+  var cmd = req.body.text;
   if (cmd.split(">").length === 1) {
     if (cmd.test("\\d+\\s+([a-zA-Z]+|[a-zA-Z]+\\s[a-zA-Z]+")) {
       var formattedInput = cmd.replace(\/s\g, '+');
@@ -20,8 +20,8 @@ app.get('/', function(req, res) {
 
       res.send({
         response_type: 'in_channel',
-        "title": "input",
-        "title_link": "url",
+        "title": cmd,
+        "title_link": url,
         attachments:[
           {
             image_url: url;
@@ -34,9 +34,11 @@ app.get('/', function(req, res) {
         "text": "Enter a valid address!",
       });
     }
-  } else {Steve's part}
+  } else {
+
+  }
 }
-*/
+
 
 
 /*
@@ -77,9 +79,7 @@ var botStore = function(textInput, attachmentInput) {
 };
 
 //need to add token validation
-  //what is difference between regular slack token validation and OAuth validation???
 //need to add valerie's address validation
-//'/directions' just for sake of testing, can change to better command
 app.post('/directions', urlencodedParser, function(req, res) {
   var splitted = req.body.text.split('>'),
       splittedLength = splitted.length,
@@ -90,7 +90,35 @@ app.post('/directions', urlencodedParser, function(req, res) {
 //valerie's if block first (static map)
 //steve's else block second (directions)
 // '/dirMap' for integrated response?
+var cmd = req.body.text;
+if (cmd.split(">").length === 1) {
+  var formattedInput = cmd.replace(\/s\g, '+');
+  var url = "https://maps.googleapis.com/maps/api/staticmap?center="+formattedInput+"&size=600x400&markers="+formattedInput;
 
+  res.send({
+    response_type: 'in_channel',
+    "title": cmd,
+    "title_link": url,
+    attachments:[
+      {
+        image_url: url;
+      }
+    ]
+  });
+  /*
+  if (cmd.test("\\d+\\s+([a-zA-Z]+|[a-zA-Z]+\\s[a-zA-Z]+")) {
+  } else {
+    res.send({
+      response_type: 'in_channel',
+      "text": "Enter a valid address!",
+    });
+  }
+} else {
+
+}
+*/
+}
+/*
   //timestamp console.log to easily discern app startup in heroku logs
   console.log(new Date().toLocaleString());
 
@@ -134,7 +162,8 @@ app.post('/directions', urlencodedParser, function(req, res) {
       console.log(theResponse);
       res.send(theResponse);
     });
-  });
+    */
+  //});
 });
 
 
