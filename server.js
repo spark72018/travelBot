@@ -107,7 +107,7 @@ if (regex.test(cmd)) {
     res.send({
       response_type: 'in_channel',
       "title": cmd,
-      "title_link": url,
+      "title_link": "http://maps.google.com/maps?f=d&source=s_d&saddr=&daddr="+formattedInput,
       attachments:[
         {
           image_url: url
