@@ -95,18 +95,18 @@ app.post('/directions', function(req, res) {
 //valerie's if block first (static map)
 //steve's else block second (directions)
 // '/dirMap' for integrated response?
-var cmd = req.body.text;
+var input = req.body.text;
 var regex = /\d+\s+([a-zA-Z]+|[a-zA-Z]+\s[a-zA-Z]+)/g;
-console.log(cmd);
-if (regex.test(cmd)) {
-  if(cmd.split(">").length === 1) {
-    var formattedInput = cmd.replace(/\s/g, '+');
+console.log(input);
+if (regex.test(input)) {
+  if(input.split(">").length === 1) {
+    var formattedInput = input.replace(/\s/g, '+');
     console.log('this is formattedInput ' + formattedInput);
     var url = "https://maps.googleapis.com/maps/api/staticmap?center="+formattedInput+"&size=600x400&markers="+formattedInput;
 
     res.send({
       response_type: 'in_channel',
-      "title": cmd,
+      "title": input,
       "title_link": "http://maps.google.com/maps?f=d&source=s_d&saddr=&daddr="+formattedInput,
       attachments:[
         {
