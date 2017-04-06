@@ -82,8 +82,8 @@ var botStore = function(textInput, attachmentInput) {
   };
 };
 
-//need to add token validation
-//need to add valerie's address validation
+//mapMe mapMeDrive mapMeBike mapMeWalk mapMeWhatever
+  //include ETA for all of them
 app.post('/directions', function(req, res) {
   /*
   var splitted = req.body.text.split('>'),
@@ -96,25 +96,76 @@ app.post('/directions', function(req, res) {
 //steve's else block second (directions)
 // '/dirMap' for integrated response?
 var input = req.body.text;
+var splitted = input.split(">");
 var regex = /\d+\s+([a-zA-Z]+|[a-zA-Z]+\s[a-zA-Z]+)/g;
-console.log(input);
+console.log('outside if/else, splitted is ', splitted);
 if (regex.test(input)) {
-  if(input.split(">").length === 1) {
+  if(splitted.length === 1) {
     var formattedInput = input.replace(/\s/g, '+');
     console.log('this is formattedInput ' + formattedInput);
     var url = "https://maps.googleapis.com/maps/api/staticmap?center="+formattedInput+"&size=600x400&markers="+formattedInput;
 
     res.send({
       response_type: 'in_channel',
-      "title": input,
-      "title_link": "http://maps.google.com/maps?f=d&source=s_d&saddr=&daddr="+formattedInput,
       attachments:[
         {
+          "title": input,
+          "title_link": "http://maps.google.com/maps?f=d&source=s_d&saddr=&daddr="+formattedInput,
           image_url: url
         }
       ]
     });
+  }else if (splitted.length === 2) {
+    //timestamp console.log to easily discern app startup in heroku logs
+    console.log(new Date().toLocaleString());
+
+    //to see what user response gets split to
+    console.log('splitted is ', splitted);
+
+    //this will go in else block
+    var p1 = googleMapsClient.geocode({
+      address: splitted[0]
+    }).asPromise();
+
+    var p2 = googleMapsClient.geocode({
+      address: splitted[1]
+    }).asPromise();
+
+    //this promise will wait for p1 and p2 to resolve before resolving itself
+    var p3 = Promise.all([p1, p2])
+
+    .then(function(values) {
+      start = values[0].json.results[0].geometry.location;
+      finish = values[1].json.results[0].geometry.location;
+
+      googleMapsClient.directions({
+        origin: start,
+        destination: finish
+      }).asPromise()
+
+      .then(function(result) {
+        //route is an array where each element is an object containing one line
+        //of the route in the .html_instructions property
+        var route = result.json.routes[0].legs[0].steps,
+            resultString = '';
+
+        //need to format last line properly after </div>
+        route.forEach(function(el) {
+          resultString += el.html_instructions.replace(/<b>|<\/b>|<div (.*?)>|<\/div>/g, '') + '\n';
+        });
+        //console.log('resultString is', resultString);
+        var ourBot = botStore(resultString);
+        var theResponse = ourBot.response();
+        console.log(theResponse);
+        res.send(theResponse);
+      });
+    });
   }
+}else {
+  res.send({
+    response_type: 'in_channel',
+    "text": "Enter a valid address!",
+  });
 }
   /*
   if (cmd.test("\\d+\\s+([a-zA-Z]+|[a-zA-Z]+\\s[a-zA-Z]+")) {
