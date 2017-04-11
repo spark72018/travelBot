@@ -89,12 +89,14 @@ app.post('/', function(req, res) {
   if (input === "help") {
     res.send({
       response_type: 'in_channel',
-      "text": "Get your directions by entering 2 addresses seperated with a >. Example,'123 N Main St > 456 S Main St.'" 
+      "text": "For directions, enter 2 addresses seperated with a '>'\n*Example - /mapme 123 N Main St > 456 S Main St*\nFor a map of your current location, enter 1 address\n*Example - /mapme 123 N Main St*" 
     });
   }
 
-  //Static img if 1 address input
+  //Start of regex test for address input
   if (regex.test(input)) {
+
+    //Static img response if 1 address input
     if(splitted.length === 1) {
       var formattedInput = input.replace(/\s/g, '+');
       console.log('formattedInput = ' + formattedInput);
@@ -109,8 +111,8 @@ app.post('/', function(req, res) {
             image_url: url
           }
         ]
-      }); //Directions else if 2 address inputs
-    } else if (splitted.length === 2) { 
+      }); 
+    } else if (splitted.length === 2) { //Directions response if 2 address inputs 
       //timestamp console.log to easily discern app startup in heroku logs
       console.log(new Date().toLocaleString());
 
@@ -155,8 +157,8 @@ app.post('/', function(req, res) {
           res.send(theResponse);
         });
       });
-    }
-  } else {
+    } 
+  } else { //Error message if input doesn't pass regex test
       res.send({
         response_type: 'in_channel',
         "text": "Enter a valid address!",
