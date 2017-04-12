@@ -89,7 +89,7 @@ app.post('/', function(req, res) {
   if (input === "help") {
     res.send({
       response_type: 'in_channel',
-      "text": "Valid commands: mapme, mapmedrive, mapmepublic, mapmewalk.\nTo get directions:/mapme[mode of transportation] 123 N Main St > 456 S Main St.\nTo get a map of your current location: /mapme 123 N Main St." 
+      "text": "Valid commands: mapme, mapmedrive, mapmepublic, mapmewalk.\nTo get directions:/mapme[mode of transportation] 123 N Main St > 456 S Main St.\nTo get a map of a specific location: /mapme 123 N Main St." 
     });
   }
 
