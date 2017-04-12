@@ -50,6 +50,7 @@ var botStore = function(textInput, attachmentInput) {
   };
 };
 
+
 //Auth
 app.get('/slack', function(req, res){
   var data = {form: {
