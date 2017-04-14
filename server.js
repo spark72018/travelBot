@@ -52,7 +52,7 @@ var botStore = function(textInput, attachmentInput) {
 
 
 //Auth
-app.get('/slack', function(req, res){
+app.get('/slack', function(req, res) {
   var data = {form: {
       client_id: process.env.SLACK_CLIENT_ID,
       client_secret: process.env.SLACK_CLIENT_SECRET,
@@ -61,7 +61,7 @@ app.get('/slack', function(req, res){
   request.post('https://slack.com/api/oauth.access', data, function (error, response, body) {
     if (!error && response.statusCode == 200) {
       // Get an auth token
-      let token = JSON.parse(body).access_token;
+      var token = JSON.parse(body).access_token;
 
       // Get the team domain name to redirect to the team URL after auth
       request.post('https://slack.com/api/team.info', {form: {token: token}}, function (error, response, body) {
@@ -69,7 +69,7 @@ app.get('/slack', function(req, res){
           if(JSON.parse(body).error == 'missing_scope') {
             res.send('MapMe has been added to your team!');
           } else {
-            let team = JSON.parse(body).team.domain;
+            var team = JSON.parse(body).team.domain;
             res.redirect('http://' +team+ '.slack.com');
           }
         }
@@ -79,7 +79,36 @@ app.get('/slack', function(req, res){
 });
 
 
-//Slash Commands
+//Create database entry for save command
+app.post('/save', function(req, res) {
+  var body = req.body;
+  var split = body.text.split(" ");
+  var locationName = split[0];
+  var address = split[1];
+  var regex = /\d+\s+([a-zA-Z]+|[a-zA-Z]+\s[a-zA-Z]+)/g;
+
+  if (regex.test(location)) {
+    var data = new savedLocation({
+      userId: body.user_id,
+      teamId: body.team_id,
+      channelId: body.channel_id,
+      location: locationName, 
+      address: address
+    });
+    data.save(err => {
+      if (err) {
+        return res.send("Error saving to database");
+      }
+    });
+  } else {
+      res.send({
+        "text": "Enter a valid address!",
+      });
+    }
+};
+
+
+//MapMe Commands
 app.post('/', function(req, res) {
   var input = req.body.text;
   var splitted = input.split(">");
@@ -90,10 +119,10 @@ app.post('/', function(req, res) {
   if (input === "help") {
     res.send({
       response_type: 'in_channel',
-      "text": "Valid commands: mapme, mapmedrive, mapmepublic, mapmewalk.\nTo get directions:/mapme[mode of transportation] 123 N Main St > 456 S Main St.\nTo get a map of a specific location: /mapme 123 N Main St." 
+      "text": "Valid commands: mapme, mapmedrive, mapmepublic, mapmewalk, save.\nTo get directions:/mapme[mode of transportation] 123 N Main St > 456 S Main St.\nTo get a map of a specific location: /mapme 123 N Main St." 
     });
   }
-
+    
   //Start of regex test for address input
   if (regex.test(input)) {
 
@@ -102,9 +131,7 @@ app.post('/', function(req, res) {
       var formattedInput = input.replace(/\s/g, '+');
       console.log('formattedInput = ' + formattedInput);
       var url = "https://maps.googleapis.com/maps/api/staticmap?center="+formattedInput+"&size=600x400&markers="+formattedInput;
-
       res.send({
-        response_type: 'in_channel',
         attachments:[
           {
             "title": input,
@@ -161,7 +188,6 @@ app.post('/', function(req, res) {
     } 
   } else { //Error message if input doesn't pass regex test
       res.send({
-        response_type: 'in_channel',
         "text": "Enter a valid address!",
       });
   }
