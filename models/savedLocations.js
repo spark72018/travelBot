@@ -1,13 +1,14 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const userLocations = new Schema({
-	//user id
-	//team id
-	//channel id
-	//location {name: String, address: String}
+const locationSchema = new Schema({
+	userId: String,
+	teamId: String,
+	channelId: String,
+	location: String, 
+	address: String
 });
 
-const ModelClass = mongoose.model("shortUrl", urlSchema);
+const ModelClass = mongoose.model("savedLocation", locationSchema);
 
 module.exports = ModelClass;
