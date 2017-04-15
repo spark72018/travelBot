@@ -9,13 +9,17 @@ body {
 	margin: 0;
 }
 .landing {
-	padding: 100px 0;
+	padding: 120px 0;
 }
 .landing p {
 	margin-bottom: 30px;
 }
 .landing h1 {
 	margin-bottom: 10px;
+	margin-top: 30px;
+}
+.landing img {
+	width: 180px;
 }
 .add-btn {
 	font-size: 18px;
@@ -24,10 +28,13 @@ body {
     display: inline-block;
     line-height: 50px;
     text-decoration: none;
-    background-color: #f9754c;
+    background-color: #de613a;
     border-radius: 3px;
     color: #fff;
     box-shadow: 2px 3px 13px #303534;
+}
+.add-btn:hover {
+	background-color: #f9754c;
 }
 a.add-btn:hover,
 a.add-btn:visited,
@@ -42,10 +49,36 @@ a.add-btn:focus {
 .main {
 	padding: 50px 0;
 }
+.command {
+	background-color: #fff;
+	text-align: left;
+	padding: 10px;
+	border-radius: 5px;
+	margin-top: 15px;
+}
+.command p {
+	color: #2e2c2b;
+	font-size: 20px;
+}
+.description {
+	color: #aeacab;
+}
 .footer {
 	background-color: #2b302e;
 	padding: 20px 0;
 }
+.command p,
 .footer p {
 	margin: 0;
+}
+.footer i {
+	font-size: 25px;
+    margin-top: 15px;
+    color: #fff;
+}
+
+@media (max-width: 767px) {
+	.description {
+		display: block;
+	}
 }
