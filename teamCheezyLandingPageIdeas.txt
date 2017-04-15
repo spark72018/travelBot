@@ -1,0 +1,66 @@
+LANDING PAGE IDEAS
+
+-is it possible to make background image a road leading somewhere but retain
+the circuitry design of current background image?
+
+-animate the pointer in compass to swirl at random time intervals/speed?
+
+-also possible to make website scroll down with background img fixed in place?
+
+-if directions too long, should we utilize landing page to generate interactive
+map with directions underneath? or just link it directly to google maps
+(if we opt for the former but it pushes our date of distribution back too much,
+ we can do the latter for now and add on to the app later)
+
+Possible intros:
+APPNAME
+1) "Get maps, directions, and traffic info, all while Slacking" (possibly too much)
+2) "Get maps, directions, and traffic info delivered right to your Slack channel"
+
+// bold all command names in quotation marks?
+// include gifs with all explanations below
+*******************************************************************************
+Choose your favorite way to travel with our directions commands:
+  /drive
+  /walk
+  /bike
+  /transit
+
+Just type in your start and finish addresses separated by a ">" like so:
+  /bike 'blahblahStart' > 'blahblahFinish'
+*******************************************************************************
+
+Get the general layout of a location with the static map generator "mapme" command:
+  /mapme 'address'
+
+*******************************************************************************
+
+By default APPNAME makes results only visible to you, but if you want to plan
+ahead with friends, or feel like sharing with everyone, end the command with
+"all" and the results will be sent publicly to the channel:
+  /etadriveall
+  /walkall
+
+*******************************************************************************
+
+If a location is important to you, then let APPNAME know with our "save" command!
+It will remember so the next time you want to use that address, you just have
+to use the label you gave it:
+(case-insensitive?, use String.toLowerCase()?);
+  /save Home: address
+  /save Work: address
+  /bike Home > Work
+-if user types in same address for different name:
+  -rewrite name of existing address? <--probably do this
+  -or add the name to same address in db alongside original name?
+
+*******************************************************************************
+
+Although ETA and distance are included with all directions, if that's the only
+information you want, start off the direction command with "eta":
+  /etadrive address1 > address2
+  /etawalk address1 > address2
+
+*******************************************************************************
+/maphelp (didn't let me make /help)
+  -will list all slash commands with concise examples?

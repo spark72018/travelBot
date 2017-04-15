@@ -35,7 +35,7 @@ var setInfo = function(str, attachment, toChannel) {
 
 var properSend = function(publicOrNot) {
   return function(param1, param2) {
-    if(publicOrNot) {
+    if(publicOrNot === 'all') {
       return setInfo(param1, param2, true).away();
     }else {
       return setInfo(param1, param2).away();
@@ -102,16 +102,17 @@ app.post('/save', function(req, res) {
 
 /*
 MapMe Commands available commands so far:
-  /mapmewalk
-  /mapmedrive
-  /mapmebike
-  /mapmetransit
-  /mapme (static image)
-  /maphelp (help command)
--ideas on how to make public? mapme commands too long?
+  /drive
+  /walk
+  /bike
+  /transit
+  /mapme
+  /mapmeall (test public slash command)
+  /etadrive (test eta slash command)
+  /maphelp (didn't let me make /help)
+
 -adding "all" to command will add "_all" to post url
-  /mapmewalk address1 > address2
-  /mapmewalkall address1 > address2
+-eta commands will add "_eta" to post url
 
   /mapme address
   /mapmeall address
@@ -124,28 +125,27 @@ MapMe Commands available commands so far:
   /npall address (static image)
 */
 
-app.post('/:command', function(req, res) {
+app.post('/:command', function(req, res) { //add option to get geocodes? too much?
   var command = req.params.command,
       input = req.body.text,
       splitted = input.split(">"),
-      commandSplit = command.split("_all");
+      cmdSplit = command.split("_");
       regex = /\d+\s+([a-zA-Z]+|[a-zA-Z]+\s[a-zA-Z]+)/g,
       publicRegEx = /_all/g,
-      toMeOrAll = commandSplit.length-1,
-      sendAway = properSend(toMeOrAll),
+      sendAway = properSend(cmdSplit[1]),
       reqObj = {};
   var helpText = "Valid commands: mapme, mapmedrive, mapmepublic, mapmewalk, save.\nTo get directions:/mapme[mode of transportation] 123 N Main St > 456 S Main St.\nTo get a map of a specific location: /mapme 123 N Main St."
   console.log('splitted = ', splitted);
-  console.log('commandSplit is', commandSplit);
+  console.log('commandSplit is', cmdSplit);
   //Help command
-  if (commandSplit[0] === "help") {
+  if (cmdSplit[0] === "help") {
     res.send(sendAway(helpText));
   }
 
   //Start of regex test for address input
   if (regex.test(input)) {
       //  /mapme will send post request to homepage/image
-    if(splitted.length === 1 && commandSplit[0] === "image") {
+    if(splitted.length === 1 && cmdSplit[0] === "image") {
       var formattedInput = input.replace(/\s/g, '+');
       console.log('formattedInput = ' + formattedInput);
       var url = "https://maps.googleapis.com/maps/api/staticmap?center="+formattedInput+"&size=600x400&markers="+formattedInput;
@@ -179,7 +179,7 @@ app.post('/:command', function(req, res) {
         finish = values[1].json.results[0].geometry.location;
 
         //mode values = 'driving', 'walking', 'bicycling', 'transit'
-        reqObj.mode = commandSplit[0];
+        reqObj.mode = cmdSplit[0];
         reqObj.departure_time = new Date;
         reqObj.traffic_model = 'best_guess';
         reqObj.origin = start;
@@ -193,7 +193,7 @@ app.post('/:command', function(req, res) {
               durationText,
               resultString;
 
-          if(commandSplit[0] === 'driving') {
+          if(cmdSplit[0] === 'driving') {
             durationText = 'ETA: ' + route.duration_in_traffic.text + ' (in current traffic)' + '\n\n';
           }else {
             durationText = 'ETA: ' + route.duration.text + '\n\n';
@@ -201,13 +201,16 @@ app.post('/:command', function(req, res) {
 
           resultString = distanceText + durationText;
 
-          route.steps.forEach(function(el) {
-            resultString += el.html_instructions
-                            .replace(/<b>|<\/b>|<\/div>/g, '')
-                            .replace(/<div (.*?)>/g, '\n') + '\n';
-          });
-          //console.log('resultString is', resultString);
-          res.send(sendAway(resultString));
+          if(cmdSplit.length === 2 && cmdSplit[1] === 'eta') {
+            res.send(sendAway(resultString));
+          }else{
+            route.steps.forEach(function(el) {
+              resultString += el.html_instructions
+                              .replace(/<b>|<\/b>|<\/div>/g, '')
+                              .replace(/<div (.*?)>/g, '\n') + '\n';
+            });
+            res.send(sendAway(resultString));
+          }
         });
       });
     }
