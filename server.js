@@ -12,37 +12,36 @@ var express = require('express'),
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
-/*
-
--example usage:
-var ourBot = botStore("THIS\nIS\nSPARTA", [{image_url: 'some url link'}]);
-console.log(ourBot.response()); //will output Object
-                                              attachments: Array[1]
-                                              text: "THIS↵IS↵SPARTA"
-                                              __proto__: Object
-*/
-
-// need to make more versatile, also need to edit slash commands for
-// sending to channel
-var fac = function(textStr, attachment, toChannel) {
+var setInfo = function(str, attachment, toChannel) {
   var store = {}, type, i;
+
   for(i=0; i<arguments.length; i++) {
     type = typeof arguments[i];
     if(type === 'string') {
       store['text'] = arguments[i];
     }else if(type === 'object') {
       store['attachments'] = arguments[i];
-    }else if(arguments[i] === true) {
+    }else if(arguments[i] == true) {
       store['response_type'] = 'in_channel';
     }
   }
+  var away = function() {
+    return store;
+  };
   return {
-    away: function() {
-      return store;
+    away: away
+  };
+};
+
+var properSend = function(publicOrNot) {
+  return function(param1, param2) {
+    if(publicOrNot) {
+      return setInfo(param1, param2, true).away();
+    }else {
+      return setInfo(param1, param2).away();
     }
   }
 };
-
 
 //Auth
 app.get('/slack', function(req, res) {
@@ -101,36 +100,63 @@ app.post('/save', function(req, res) {
 });
 
 
-//MapMe Commands
+/*
+MapMe Commands available commands so far:
+  /mapmewalk
+  /mapmedrive
+  /mapmebike
+  /mapmetransit
+  /mapme (static image)
+  /maphelp (help command)
+-ideas on how to make public? mapme commands too long?
+-adding "all" to command will add "_all" to post url
+  /mapmewalk address1 > address2
+  /mapmewalkall address1 > address2
+
+  /mapme address
+  /mapmeall address
+
+  NavPal? (/npwalk, /npdrive np ~ "No Problem") MapPal?(/mpwalk, /mphelp) MaPal? (same)
+  /npwalk address1 > address2
+  /npwalkall address1 > address2
+
+  /np address (static image)
+  /npall address (static image)
+*/
+
 app.post('/:command', function(req, res) {
   var command = req.params.command,
       input = req.body.text,
       splitted = input.split(">"),
+      commandSplit = command.split("_all");
       regex = /\d+\s+([a-zA-Z]+|[a-zA-Z]+\s[a-zA-Z]+)/g,
+      publicRegEx = /_all/g,
+      toMeOrAll = commandSplit.length-1,
+      sendAway = properSend(toMeOrAll),
       reqObj = {};
   var helpText = "Valid commands: mapme, mapmedrive, mapmepublic, mapmewalk, save.\nTo get directions:/mapme[mode of transportation] 123 N Main St > 456 S Main St.\nTo get a map of a specific location: /mapme 123 N Main St."
   console.log('splitted = ', splitted);
+  console.log('commandSplit is', commandSplit);
   //Help command
-  if (command === "help") {
-    res.send(fac(helpText).away());
+  if (commandSplit[0] === "help") {
+    res.send(sendAway(helpText));
   }
 
   //Start of regex test for address input
   if (regex.test(input)) {
       //  /mapme will send post request to homepage/image
-    if(splitted.length === 1 && command === "image") {
+    if(splitted.length === 1 && commandSplit[0] === "image") {
       var formattedInput = input.replace(/\s/g, '+');
       console.log('formattedInput = ' + formattedInput);
       var url = "https://maps.googleapis.com/maps/api/staticmap?center="+formattedInput+"&size=600x400&markers="+formattedInput;
-      res.send({
-        attachments:[
-          {
-            "title": input,
-            "title_link": "http://maps.google.com/maps?f=d&source=s_d&saddr=&daddr="+formattedInput,
-            image_url: url
-          }
-        ]
-      });
+      var attachObj = [
+        {
+          "title": input,
+          "title_link": "http://maps.google.com/maps?f=d&source=s_d&saddr=&daddr="+formattedInput,
+          image_url: url
+        }
+      ];
+      res.send(sendAway(attachObj));
     } else if (splitted.length === 2) {
       //timestamp console.log to easily discern app startup in logs
       console.log(new Date().toLocaleString());
@@ -153,7 +179,7 @@ app.post('/:command', function(req, res) {
         finish = values[1].json.results[0].geometry.location;
 
         //mode values = 'driving', 'walking', 'bicycling', 'transit'
-        reqObj.mode = command;
+        reqObj.mode = commandSplit[0];
         reqObj.departure_time = new Date;
         reqObj.traffic_model = 'best_guess';
         reqObj.origin = start;
@@ -167,7 +193,7 @@ app.post('/:command', function(req, res) {
               durationText,
               resultString;
 
-          if(command === 'driving') {
+          if(commandSplit[0] === 'driving') {
             durationText = 'ETA: ' + route.duration_in_traffic.text + ' (in current traffic)' + '\n\n';
           }else {
             durationText = 'ETA: ' + route.duration.text + '\n\n';
@@ -181,15 +207,14 @@ app.post('/:command', function(req, res) {
                             .replace(/<div (.*?)>/g, '\n') + '\n';
           });
           //console.log('resultString is', resultString);
-          res.send(fac(resultString).away());
+          res.send(sendAway(resultString));
         });
       });
     }
   } else { //Error message if input doesn't pass regex test
-      res.send(fac("Enter a valid address!").away());
+      res.send(sendAway('Enter a valid address!'));
   }
 });
-
 
 //Listening
 var port = process.env.PORT || 3000;
