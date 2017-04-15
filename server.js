@@ -108,16 +108,15 @@ app.post('/:command', function(req, res) {
   var helpText = "Valid commands: mapme, mapmedrive, mapmepublic, mapmewalk, save.\nTo get directions:/mapme[mode of transportation] 123 N Main St > 456 S Main St.\nTo get a map of a specific location: /mapme 123 N Main St."
   console.log('splitted = ', splitted);
   //Help command
-  //  /mapme will send post request to homepage/image
-  if (command === "image") {
-    res.send(fac(true, helpText).response());
+  if (command === "help") {
+    res.send(fac(helpText).response());
   }
 
   //Start of regex test for address input
   if (regex.test(input)) {
 
-    //Static img response if 1 address input
-    if(splitted.length === 1) {
+      //  /mapme will send post request to homepage/image
+    if(splitted.length === 1 && command === "image") {
       var formattedInput = input.replace(/\s/g, '+');
       console.log('formattedInput = ' + formattedInput);
       var url = "https://maps.googleapis.com/maps/api/staticmap?center="+formattedInput+"&size=600x400&markers="+formattedInput;
@@ -154,7 +153,7 @@ app.post('/:command', function(req, res) {
         finish = values[1].json.results[0].geometry.location;
 
         //mode values = 'driving', 'walking', 'bicycling', 'transit'
-        reqObj.mode = mode;
+        reqObj.mode = command;
         reqObj.departure_time = new Date;
         reqObj.traffic_model = 'best_guess';
         reqObj.origin = start;
@@ -170,7 +169,7 @@ app.post('/:command', function(req, res) {
               durationText,
               resultString;
 
-          if(mode === 'driving') {
+          if(command === 'driving') {
             durationText = 'ETA: ' + route.duration_in_traffic.text + ' (in current traffic)' + '\n\n';
           }else {
             durationText = 'ETA: ' + route.duration.text + '\n\n';
