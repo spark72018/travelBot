@@ -2,17 +2,23 @@
 <html>
 	<head>
 	  <meta charset="UTF-8">
-	  <title>MapMe</title>
+	  <title>MapMe Bot</title>
+	  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+	  <meta http-equiv="x-ua-compatible" content="ie=edge">
+	  <meta name="title" content="MapMe Bot">
+	  <meta name="description" content="Slack bot that lets you get directions and map locations without leaving your chats">
 	  <link rel="stylesheet prefetch" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
-	  <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
-	  <link href="https://fonts.googleapis.com/css?family=Work+Sans" rel="stylesheet">
+	  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+	  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Work+Sans">
+	  <link rel="icon" href="favicon.ico" type="image/x-icon" />
 	  <link rel="stylesheet" href="css/style.css">
 	</head>
 		
 	<body>
 		<div class="container">
 			<div class="row landing">
-				<h1>MapMe Bot</h1>
+				<img src="images/logo.png"/>
+				<h1><strong>MapMe</strong> Bot</h1>
 				<p>Get directions and map your locations straight from Slack</p>
 				<a href="https://slack.com/oauth/authorize?scope=incoming-webhook&client_id=158595057431.159917305988" class="add-btn" target="_blank">
 					<img src="images/white-slack-icon.png"/>
@@ -20,13 +26,31 @@
 				</a>
 			</div>
 			<div class="row main">
-				<p>Some intro text about our bot and what it does</p>
-				<h3>Available commands:</h3>
+				<h3>Available commands:</h3>	
+				<div class="col-md-8 col-md-offset-2 command">
+					<p>/save [locationname] [address] <span class="description">(Save a location to reuse)</span></p>
+				</div>
+				<div class="col-md-8 col-md-offset-2 command">
+					<p>/mapme [address] <span class="description">(Get a static map image of entered address)</span></p>
+				</div>
+				<div class="col-md-8 col-md-offset-2 command">
+					<p>/mapmedrive [address] > [address] <span class="description">(Get driving directions)</span></p>
+				</div>
+				<div class="col-md-8 col-md-offset-2 command">
+					<p>/mapmewalk [address] > [address] <span class="description">(Get walking directions)</span></p>
+				</div>
+				<div class="col-md-8 col-md-offset-2 command">
+					<p>/mapmetransit [address] > [address] <span class="description">(Get transit directions)</span></p>
+				</div>
+				<div class="col-md-8 col-md-offset-2 command">
+					<p>/help <span class="description">(Get help!)</span></p>
+				</div>
 			</div>
 		</div>
 		<div class="container-fluid footer">
 			<div class="row">
-				<p>&copy; Team Cheezy</p>
+				<p>&copy; 2017 Team Cheezy</p>
+				<a href="https://github.com/spark72018/travelBot" target="_blank"><i class="fa fa-github" aria-hidden="true"></i></a>
 			</div>
 		</div>
 	</body>
