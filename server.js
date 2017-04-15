@@ -135,12 +135,8 @@ app.post('/:command', function(req, res) { //add option to get geocodes? too muc
       sendAway = properSend(cmdSplit[1]),
       reqObj = {};
   var helpText = "Valid commands: mapme, mapmedrive, mapmepublic, mapmewalk, save.\nTo get directions:/mapme[mode of transportation] 123 N Main St > 456 S Main St.\nTo get a map of a specific location: /mapme 123 N Main St."
-  console.log('splitted = ', splitted);
-<<<<<<< HEAD
-
-=======
   console.log('commandSplit is', cmdSplit);
->>>>>>> 90053d539f71dace5af9c1504f8145b774b262b7
+
   //Help command
   if (cmdSplit[0] === "help") {
     res.send(sendAway(helpText));
