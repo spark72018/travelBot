@@ -21,6 +21,9 @@ console.log(ourBot.response()); //will output Object
                                               text: "THIS↵IS↵SPARTA"
                                               __proto__: Object
 */
+
+// need to make more versatile, also need to edit slash commands for
+// sending to channel
 var fac = function(textStr, attachment, toChannel) {
   var store = {}, type, i;
   for(i=0; i<arguments.length; i++) {
@@ -34,7 +37,7 @@ var fac = function(textStr, attachment, toChannel) {
     }
   }
   return {
-    response: function() {
+    away: function() {
       return store;
     }
   }
@@ -109,12 +112,11 @@ app.post('/:command', function(req, res) {
   console.log('splitted = ', splitted);
   //Help command
   if (command === "help") {
-    res.send(fac(helpText).response());
+    res.send(fac(helpText).away());
   }
 
   //Start of regex test for address input
   if (regex.test(input)) {
-
       //  /mapme will send post request to homepage/image
     if(splitted.length === 1 && command === "image") {
       var formattedInput = input.replace(/\s/g, '+');
@@ -129,14 +131,13 @@ app.post('/:command', function(req, res) {
           }
         ]
       });
-    } else if (splitted.length === 2) { //Directions response if 2 address inputs
-      //timestamp console.log to easily discern app startup in heroku logs
+    } else if (splitted.length === 2) {
+      //timestamp console.log to easily discern app startup in logs
       console.log(new Date().toLocaleString());
 
       //to see what user response gets split to
       console.log('splitted is ', splitted);
 
-      //this will go in else block
       var p1 = googleMapsClient.geocode({
         address: splitted[0]
       }).asPromise();
@@ -145,7 +146,6 @@ app.post('/:command', function(req, res) {
         address: splitted[1]
       }).asPromise();
 
-      //this promise will wait for p1 and p2 to resolve before resolving itself
       var p3 = Promise.all([p1, p2])
 
       .then(function(values) {
@@ -162,8 +162,6 @@ app.post('/:command', function(req, res) {
         googleMapsClient.directions(reqObj).asPromise()
 
         .then(function(result) {
-          //route is an array where each element is an object containing one line
-          //of the route in the .html_instructions property
           var route = result.json.routes[0].legs[0],
               distanceText = 'Distance: ' + route.distance.text + '\n',
               durationText,
@@ -183,12 +181,12 @@ app.post('/:command', function(req, res) {
                             .replace(/<div (.*?)>/g, '\n') + '\n';
           });
           //console.log('resultString is', resultString);
-          res.send(fac(resultString).response());
+          res.send(fac(resultString).away());
         });
       });
     }
   } else { //Error message if input doesn't pass regex test
-      res.send(fac("Enter a valid address!").response());
+      res.send(fac("Enter a valid address!").away());
   }
 });
 
