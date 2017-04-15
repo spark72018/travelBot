@@ -12,34 +12,36 @@ var express = require('express'),
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
-/*
-
--example usage:
-var ourBot = botStore("THIS\nIS\nSPARTA", [{image_url: 'some url link'}]);
-console.log(ourBot.response()); //will output Object
-                                              attachments: Array[1]
-                                              text: "THIS↵IS↵SPARTA"
-                                              __proto__: Object
-*/
-var fac = function(textStr, attachment, toChannel) {
+var setInfo = function(str, attachment, toChannel) {
   var store = {}, type, i;
+
   for(i=0; i<arguments.length; i++) {
     type = typeof arguments[i];
     if(type === 'string') {
       store['text'] = arguments[i];
     }else if(type === 'object') {
       store['attachments'] = arguments[i];
-    }else if(arguments[i] === true) {
+    }else if(arguments[i] == true) {
       store['response_type'] = 'in_channel';
     }
   }
+  var away = function() {
+    return store;
+  };
   return {
-    response: function() {
-      return store;
+    away: away
+  };
+};
+
+var properSend = function(publicOrNot) {
+  return function(param1, param2) {
+    if(publicOrNot === 'all') {
+      return setInfo(param1, param2, true).away();
+    }else {
+      return setInfo(param1, param2).away();
     }
   }
 };
-
 
 //Auth
 app.get('/slack', function(req, res) {
@@ -98,46 +100,74 @@ app.post('/save', function(req, res) {
 });
 
 
-//MapMe Commands
-app.post('/:command', function(req, res) {
+/*
+MapMe Commands available commands so far:
+  /drive
+  /walk
+  /bike
+  /transit
+  /mapme
+  /mapmeall (test public slash command)
+  /etadrive (test eta slash command)
+  /maphelp (didn't let me make /help)
+
+-adding "all" to command will add "_all" to post url
+-eta commands will add "_eta" to post url
+
+  /mapme address
+  /mapmeall address
+
+  NavPal? (/npwalk, /npdrive np ~ "No Problem") MapPal?(/mpwalk, /mphelp) MaPal? (same)
+  /npwalk address1 > address2
+  /npwalkall address1 > address2
+
+  /np address (static image)
+  /npall address (static image)
+*/
+
+app.post('/:command', function(req, res) { //add option to get geocodes? too much?
   var command = req.params.command,
       input = req.body.text,
       splitted = input.split(">"),
+      cmdSplit = command.split("_");
       regex = /\d+\s+([a-zA-Z]+|[a-zA-Z]+\s[a-zA-Z]+)/g,
+      publicRegEx = /_all/g,
+      sendAway = properSend(cmdSplit[1]),
       reqObj = {};
   var helpText = "Valid commands: mapme, mapmedrive, mapmepublic, mapmewalk, save.\nTo get directions:/mapme[mode of transportation] 123 N Main St > 456 S Main St.\nTo get a map of a specific location: /mapme 123 N Main St."
   console.log('splitted = ', splitted);
+<<<<<<< HEAD
 
+=======
+  console.log('commandSplit is', cmdSplit);
+>>>>>>> 90053d539f71dace5af9c1504f8145b774b262b7
   //Help command
-  if (command === "help") {
-    res.send(fac(helpText).response());
+  if (cmdSplit[0] === "help") {
+    res.send(sendAway(helpText));
   }
 
   //Start of regex test for address input
   if (regex.test(input)) {
-
       //  /mapme will send post request to homepage/image
-    if(splitted.length === 1 && command === "image") {
+    if(splitted.length === 1 && cmdSplit[0] === "image") {
       var formattedInput = input.replace(/\s/g, '+');
       console.log('formattedInput = ' + formattedInput);
       var url = "https://maps.googleapis.com/maps/api/staticmap?center="+formattedInput+"&size=600x400&markers="+formattedInput;
-      res.send({
-        attachments:[
-          {
-            "title": input,
-            "title_link": "http://maps.google.com/maps?f=d&source=s_d&saddr=&daddr="+formattedInput,
-            image_url: url
-          }
-        ]
-      });
-    } else if (splitted.length === 2) { //Directions response if 2 address inputs
-      //timestamp console.log to easily discern app startup in heroku logs
+      var attachObj = [
+        {
+          "title": input,
+          "title_link": "http://maps.google.com/maps?f=d&source=s_d&saddr=&daddr="+formattedInput,
+          image_url: url
+        }
+      ];
+      res.send(sendAway(attachObj));
+    } else if (splitted.length === 2) {
+      //timestamp console.log to easily discern app startup in logs
       console.log(new Date().toLocaleString());
 
       //to see what user response gets split to
       console.log('splitted is ', splitted);
 
-      //this will go in else block
       var p1 = googleMapsClient.geocode({
         address: splitted[0]
       }).asPromise();
@@ -146,7 +176,6 @@ app.post('/:command', function(req, res) {
         address: splitted[1]
       }).asPromise();
 
-      //this promise will wait for p1 and p2 to resolve before resolving itself
       var p3 = Promise.all([p1, p2])
 
       .then(function(values) {
@@ -154,7 +183,7 @@ app.post('/:command', function(req, res) {
         finish = values[1].json.results[0].geometry.location;
 
         //mode values = 'driving', 'walking', 'bicycling', 'transit'
-        reqObj.mode = command;
+        reqObj.mode = cmdSplit[0];
         reqObj.departure_time = new Date;
         reqObj.traffic_model = 'best_guess';
         reqObj.origin = start;
@@ -163,14 +192,12 @@ app.post('/:command', function(req, res) {
         googleMapsClient.directions(reqObj).asPromise()
 
         .then(function(result) {
-          //route is an array where each element is an object containing one line
-          //of the route in the .html_instructions property
           var route = result.json.routes[0].legs[0],
               distanceText = 'Distance: ' + route.distance.text + '\n',
               durationText,
               resultString;
 
-          if(command === 'driving') {
+          if(cmdSplit[0] === 'driving') {
             durationText = 'ETA: ' + route.duration_in_traffic.text + ' (in current traffic)' + '\n\n';
           }else {
             durationText = 'ETA: ' + route.duration.text + '\n\n';
@@ -178,21 +205,23 @@ app.post('/:command', function(req, res) {
 
           resultString = distanceText + durationText;
 
-          route.steps.forEach(function(el) {
-            resultString += el.html_instructions
-                            .replace(/<b>|<\/b>|<\/div>/g, '')
-                            .replace(/<div (.*?)>/g, '\n') + '\n';
-          });
-          //console.log('resultString is', resultString);
-          res.send(fac(resultString).response());
+          if(cmdSplit.length === 2 && cmdSplit[1] === 'eta') {
+            res.send(sendAway(resultString));
+          }else{
+            route.steps.forEach(function(el) {
+              resultString += el.html_instructions
+                              .replace(/<b>|<\/b>|<\/div>/g, '')
+                              .replace(/<div (.*?)>/g, '\n') + '\n';
+            });
+            res.send(sendAway(resultString));
+          }
         });
       });
     }
   } else { //Error message if input doesn't pass regex test
-      res.send(fac("Enter a valid address!").response());
+      res.send(sendAway('Enter a valid address!'));
   }
 });
-
 
 //Listening
 var port = process.env.PORT || 3000;
