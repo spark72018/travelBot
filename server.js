@@ -13,7 +13,7 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
 /*
--generates our response object
+
 -example usage:
 var ourBot = botStore("THIS\nIS\nSPARTA", [{image_url: 'some url link'}]);
 console.log(ourBot.response()); //will output Object
@@ -21,33 +21,23 @@ console.log(ourBot.response()); //will output Object
                                               text: "THIS↵IS↵SPARTA"
                                               __proto__: Object
 */
-//needs work, code is not DRY
-
-var botStore = function(textInput, attachmentInput) {
-  var store,
-      argsLength = arguments.length;
-  if(argsLength === 2) {
-    store = {
-      'response_type': 'in_channel',
-      'text': arguments[0],
-      'attachments': arguments[1]
-    };
-  }else if(typeof arguments[0] === 'string') {
-    store = {
-      'response_type': 'in_channel',
-      'text': arguments[0]
-    };
-  }else {
-    store = {
-      'response_type': 'in_channel',
-      'attachments' : arguments[0]
-    };
+var fac = function(textStr, attachment, toChannel) {
+  var store = {}, type, i;
+  for(i=0; i<arguments.length; i++) {
+    type = typeof arguments[i];
+    if(type === 'string') {
+      store['text'] = arguments[i];
+    }else if(type === 'object') {
+      store['attachments'] = arguments[i];
+    }else if(arguments[i] === true) {
+      store['response_type'] = 'in_channel';
+    }
   }
   return {
     response: function() {
       return store;
     }
-  };
+  }
 };
 
 
@@ -92,7 +82,7 @@ app.post('/save', function(req, res) {
       userId: body.user_id,
       teamId: body.team_id,
       channelId: body.channel_id,
-      location: locationName, 
+      location: locationName,
       address: address
     });
     data.save(err => {
@@ -105,24 +95,24 @@ app.post('/save', function(req, res) {
         "text": "Enter a valid address!",
       });
     }
-};
+});
 
 
 //MapMe Commands
-app.post('/', function(req, res) {
-  var input = req.body.text;
-  var splitted = input.split(">");
-  var regex = /\d+\s+([a-zA-Z]+|[a-zA-Z]+\s[a-zA-Z]+)/g;
+app.post('/:command', function(req, res) {
+  var command = req.params.command,
+      input = req.body.text,
+      splitted = input.split(">"),
+      regex = /\d+\s+([a-zA-Z]+|[a-zA-Z]+\s[a-zA-Z]+)/g,
+      reqObj = {};
+  var helpText = "Valid commands: mapme, mapmedrive, mapmepublic, mapmewalk, save.\nTo get directions:/mapme[mode of transportation] 123 N Main St > 456 S Main St.\nTo get a map of a specific location: /mapme 123 N Main St."
   console.log('splitted = ', splitted);
-
   //Help command
-  if (input === "help") {
-    res.send({
-      response_type: 'in_channel',
-      "text": "Valid commands: mapme, mapmedrive, mapmepublic, mapmewalk, save.\nTo get directions:/mapme[mode of transportation] 123 N Main St > 456 S Main St.\nTo get a map of a specific location: /mapme 123 N Main St." 
-    });
+  //  /mapme will send post request to homepage/image
+  if (command === "image") {
+    res.send(fac(true, helpText).response());
   }
-    
+
   //Start of regex test for address input
   if (regex.test(input)) {
 
@@ -139,8 +129,8 @@ app.post('/', function(req, res) {
             image_url: url
           }
         ]
-      }); 
-    } else if (splitted.length === 2) { //Directions response if 2 address inputs 
+      });
+    } else if (splitted.length === 2) { //Directions response if 2 address inputs
       //timestamp console.log to easily discern app startup in heroku logs
       console.log(new Date().toLocaleString());
 
@@ -163,33 +153,43 @@ app.post('/', function(req, res) {
         start = values[0].json.results[0].geometry.location;
         finish = values[1].json.results[0].geometry.location;
 
-        googleMapsClient.directions({
-          origin: start,
-          destination: finish
-        }).asPromise()
+        //mode values = 'driving', 'walking', 'bicycling', 'transit'
+        reqObj.mode = mode;
+        reqObj.departure_time = new Date;
+        reqObj.traffic_model = 'best_guess';
+        reqObj.origin = start;
+        reqObj.destination = finish;
+
+        googleMapsClient.directions(reqObj).asPromise()
 
         .then(function(result) {
           //route is an array where each element is an object containing one line
           //of the route in the .html_instructions property
-          var route = result.json.routes[0].legs[0].steps,
-              resultString = '';
+          var route = result.json.routes[0].legs[0],
+              distanceText = 'Distance: ' + route.distance.text + '\n',
+              durationText,
+              resultString;
 
-          //need to format last line properly after </div>
-          route.forEach(function(el) {
-            resultString += el.html_instructions.replace(/<b>|<\/b>|<div (.*?)>|<\/div>/g, '') + '\n';
+          if(mode === 'driving') {
+            durationText = 'ETA: ' + route.duration_in_traffic.text + ' (in current traffic)' + '\n\n';
+          }else {
+            durationText = 'ETA: ' + route.duration.text + '\n\n';
+          }
+
+          resultString = distanceText + durationText;
+
+          route.steps.forEach(function(el) {
+            resultString += el.html_instructions
+                            .replace(/<b>|<\/b>|<\/div>/g, '')
+                            .replace(/<div (.*?)>/g, '\n') + '\n';
           });
           //console.log('resultString is', resultString);
-          var ourBot = botStore(resultString);
-          var theResponse = ourBot.response();
-          console.log(theResponse);
-          res.send(theResponse);
+          res.send(fac(resultString).response());
         });
       });
-    } 
+    }
   } else { //Error message if input doesn't pass regex test
-      res.send({
-        "text": "Enter a valid address!",
-      });
+      res.send(fac("Enter a valid address!").response());
   }
 });
 
