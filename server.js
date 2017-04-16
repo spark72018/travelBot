@@ -1,5 +1,8 @@
 var express = require('express'),
     bodyParser = require('body-parser'),
+    mongoose = require('mongoose'),
+    savedLocations = require("./models/savedLocations"),
+    request = require('request'),
     //urlencodedParser = bodyParser.urlencoded({extended: false}),
     app = express(),
     apiKey = process.env.MAPKEY,
@@ -43,6 +46,7 @@ var properSend = function(publicOrNot) {
   }
 };
 
+
 //Auth
 app.get('/slack', function(req, res) {
   var data = {form: {
@@ -58,12 +62,12 @@ app.get('/slack', function(req, res) {
       // Get the team domain name to redirect to the team URL after auth
       request.post('https://slack.com/api/team.info', {form: {token: token}}, function (error, response, body) {
         if (!error && response.statusCode == 200) {
-          if(JSON.parse(body).error == 'missing_scope') {
-            res.send('MapMe has been added to your team!');
-          } else {
+          // if(JSON.parse(body).error == 'missing_scope') {
+          //   res.send('NavBuddy has been added to your team!');
+          // } else {
             var team = JSON.parse(body).team.domain;
-            res.redirect('http://' +team+ '.slack.com');
-          }
+            res.redirect('http://'+team+'.slack.com');
+          //}
         }
       });
     }
@@ -73,24 +77,28 @@ app.get('/slack', function(req, res) {
 
 //Create database entry for save command
 app.post('/save', function(req, res) {
-  var body = req.body;
-  var split = body.text.split(">");
+  var split = req.body.text.split(">");
   var locationName = split[0];
   var address = split[1];
   var regex = /\d+\s+([a-zA-Z]+|[a-zA-Z]+\s[a-zA-Z]+)/g;
 
-  if (regex.test(location)) {
-    var data = new savedLocation({
-      userId: body.user_id,
-      teamId: body.team_id,
-      channelId: body.channel_id,
-      location: locationName,
+  console.log("location name = " + locationName);
+  console.log("address = " + address);
+
+  if (regex.test(address) && locationName !== "") {
+    var data = {
+      userName: req.body.user_name,
+      userId: req.body.user_id,
+      teamId: req.body.team_id,
+      channelId: req.body.channel_id,
+      name: locationName,
       address: address
-    });
-    data.save(function(err) {
-      if (err) {
-        return res.send("Error saving to database");
-      }
+    };
+    savedLocations.create(data, function(error, location) {
+      console.log(location);
+      res.send({
+        "text": "Location saved!",
+      });
     });
   } else {
       res.send({

@@ -2,14 +2,14 @@
 <html>
 	<head>
 	  <meta charset="UTF-8">
-	  <title>MapMeBot</title>
+	  <title>NavBuddy</title>
 	  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 	  <meta http-equiv="x-ua-compatible" content="ie=edge">
-	  <meta name="title" content="MapMeBot">
+	  <meta name="title" content="NavBuddy">
 	  <meta name="description" content="Slack bot that lets you get directions and map locations without leaving your chats">
 	  <link rel="stylesheet prefetch" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
 	  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-	  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Work+Sans">
+	  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Work+Sans:300,400,500">
 	  <link rel="icon" href="favicon.ico" type="image/x-icon" />
 	  <link rel="stylesheet" href="css/style.css">
 	</head>
@@ -18,10 +18,21 @@
 		<div class="container">
 			<div class="row landing">
 				<div class="logo-header">
-					<img src="images/logo.png"/>
-					<h1><strong>MapMe</strong>Bot</h1>
+					<!-- logo -->
+					<div class="logo-img">
+						<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+						 width="90px" height="90px" viewBox="0 0 300 300" enable-background="new 0 0 300 300" xml:space="preserve">
+						<ellipse fill="none" stroke="#de613a" stroke-width="25" stroke-miterlimit="10" cx="150.013" cy="153.477" rx="130.642" ry="131.175"/>
+						<polygon fill="none" stroke="#de613a" stroke-width="14" stroke-miterlimit="10" points="122.866,146.034 175.962,176.294 
+							100.197,241.658 "/>
+						<polygon fill="#de613a" stroke="#de613a" stroke-width="14" stroke-miterlimit="10" points="182.917,164.433 129.168,135.349 
+							203.476,68.333 "/>
+						</svg>
+					</div>
+					<!-- logo -->
+					<h1><strong>Nav</strong>Buddy</h1>
 				</div>
-				<h4>Get directions and map your locations straight from Slack</h4>
+				<h4>Get maps, directions, and traffic info delivered straight to your Slack channel</h4>
 				<a href="https://slack.com/oauth/authorize?scope=incoming-webhook&client_id=158595057431.159917305988" class="add-btn" target="_blank">
 					<img src="images/white-slack-icon.png"/>
 					Add to Slack
@@ -30,25 +41,51 @@
 		</div>
 		<div class="container-fluid main">
 			<div class="row">
-				<h3>Available commands:</h3>	
-				<div class="col-md-8 col-md-offset-2 command">
-					<p>/save [locationname] [address] <span class="description">(Save a location to reuse)</span></p>
+				<h3>Choose your favorite way to travel with our directions commands:</h3>
+				<div class="col-md-5 col-md-offset-1">
+					<div class="command">
+						<p>/drive</p>
+					</div>
+					<div class="command">
+						<p>/walk</p>
+					</div>
 				</div>
-				<div class="col-md-8 col-md-offset-2 command">
-					<p>/mapme [address] <span class="description">(Get a static map image of entered address)</span></p>
+				<div class="col-md-5">
+					<div class="command">
+						<p>/bike</p>
+					</div>
+					<div class="command">
+						<p>/transit</p>
+					</div>
 				</div>
-				<div class="col-md-8 col-md-offset-2 command">
-					<p>/mapmedrive [address] > [address] <span class="description">(Get driving directions)</span></p>
-				</div>
-				<div class="col-md-8 col-md-offset-2 command">
-					<p>/mapmewalk [address] > [address] <span class="description">(Get walking directions)</span></p>
-				</div>
-				<div class="col-md-8 col-md-offset-2 command">
-					<p>/mapmetransit [address] > [address] <span class="description">(Get transit directions)</span></p>
-				</div>
-				<div class="col-md-8 col-md-offset-2 command">
-					<p>/help <span class="description">(Get help!)</span></p>
-				</div>
+			</div>
+			<div class="row">	
+				<div class="col-md-5 col-md-offset-1" style="background-color: grey; height: 400px;">
+					
+				</div>	
+				<div class="col-md-5">
+					<h3 class="text-left">Just type your <strong>Start</strong> and <strong>Finish</strong> addresses separated by a ">":</h3>
+					<div class="command">
+						<p>/bike [Start] > [Finish]</p>
+					</div>
+				</div>	
+			</div>
+			<div class="row">
+				<div class="col-md-5 col-md-offset-1">
+					<h3 class="text-left">Or, get the general layout of a location with the static map generator <strong>/mapme</strong> command:</h3>
+					<div class="command">
+						<p>/mapme [Address]</p>
+					</div>
+				</div>	
+				<div class="col-md-5" style="background-color: grey; height: 400px;"></div>
+			</div>
+			<div class="row">
+				<div class="col-md-8 col-md-offset-2 ">
+					<h3>If a location is important to you, then let NavBuddy know with our <strong>/save</strong> command! The next time you want to use that address, just use the label you gave it:</h3>
+					<div class="command">
+						<p>/save [Name] > [Address]</p>
+					</div>
+				</div>	
 			</div>
 		</div>
 		<div class="container-fluid footer">
