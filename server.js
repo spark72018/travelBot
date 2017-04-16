@@ -74,7 +74,7 @@ app.get('/slack', function(req, res) {
 //Create database entry for save command
 app.post('/save', function(req, res) {
   var body = req.body;
-  var split = body.text.split(" ");
+  var split = body.text.split(">");
   var locationName = split[0];
   var address = split[1];
   var regex = /\d+\s+([a-zA-Z]+|[a-zA-Z]+\s[a-zA-Z]+)/g;
@@ -87,7 +87,7 @@ app.post('/save', function(req, res) {
       location: locationName,
       address: address
     });
-    data.save(err => {
+    data.save(function(err) {
       if (err) {
         return res.send("Error saving to database");
       }
@@ -134,8 +134,8 @@ app.post('/:command', function(req, res) { //add option to get geocodes? too muc
       sendAway = properSend(cmdSplit[1]),
       reqObj = {};
   var helpText = "Valid commands: mapme, mapmedrive, mapmepublic, mapmewalk, save.\nTo get directions:/mapme[mode of transportation] 123 N Main St > 456 S Main St.\nTo get a map of a specific location: /mapme 123 N Main St."
-  console.log('splitted = ', splitted);
   console.log('commandSplit is', cmdSplit);
+
   //Help command
   if (cmdSplit[0] === "help") {
     res.send(sendAway(helpText));

@@ -9,11 +9,11 @@ body {
 	margin: 0;
 }
 .landing {
-	padding: 160px 0;
+	padding: 180px 0;
 }
 .logo-header {
 	display: table;
-	margin: 0 auto 30px auto;
+	margin: 0 auto 25px auto;
 }
 .logo-header h1 {
 	display: table-cell;
@@ -40,7 +40,7 @@ body {
     background-color: #de613a;
     border-radius: 3px;
     color: #fff;
-    box-shadow: 2px 3px 13px #303534;
+    box-shadow: 2px 3px 13px #787e7c;
 }
 .add-btn:hover {
 	background-color: #f9754c;
@@ -57,6 +57,11 @@ a.add-btn:focus {
 }
 .main {
 	padding: 50px 0;
+	background-color: #fff;
+}
+.main h3 {
+	color: #de613a;
+	margin-top: 0;
 }
 .command {
 	background-color: #fff;
@@ -64,6 +69,7 @@ a.add-btn:focus {
 	padding: 10px;
 	border-radius: 5px;
 	margin-top: 15px;
+	border: 1.5px solid #ccc;
 }
 .command p {
 	color: #2e2c2b;
