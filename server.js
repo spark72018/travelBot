@@ -139,7 +139,6 @@ app.post('/:command', function(req, res) { //add option to get geocodes? too muc
       splitted = input.split(">"),
       cmdSplit = command.split("_");
       regex = /\d+\s+([a-zA-Z]+|[a-zA-Z]+\s[a-zA-Z]+)/g,
-      publicRegEx = /_all/g,
       sendAway = properSend(cmdSplit[1]),
       reqObj = {};
   var helpText = "Valid commands: mapme, mapmedrive, mapmepublic, mapmewalk, save.\nTo get directions:/mapme[mode of transportation] 123 N Main St > 456 S Main St.\nTo get a map of a specific location: /mapme 123 N Main St."
