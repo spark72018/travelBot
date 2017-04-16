@@ -13,7 +13,7 @@ map with directions underneath? or just link it directly to google maps
  we can do the latter for now and add on to the app later)
 
 Possible intros:
-APPNAME
+                                NavBuddy
 1) "Get maps, directions, and traffic info, all while Slacking" (possibly too much)
 2) "Get maps, directions, and traffic info delivered right to your Slack channel"
 
@@ -35,7 +35,7 @@ Get the general layout of a location with the static map generator "mapme" comma
 
 *******************************************************************************
 
-By default APPNAME makes results only visible to you, but if you want to plan
+By default NavBuddy makes results only visible to you, but if you want to plan
 ahead with friends, or feel like sharing with everyone, end the command with
 "all" and the results will be sent publicly to the channel:
   /etadriveall
@@ -43,7 +43,7 @@ ahead with friends, or feel like sharing with everyone, end the command with
 
 *******************************************************************************
 
-If a location is important to you, then let APPNAME know with our "save" command!
+If a location is important to you, then let NavBuddy know with our "save" command!
 It will remember so the next time you want to use that address, you just have
 to use the label you gave it:
 (case-insensitive?, use String.toLowerCase()?);
