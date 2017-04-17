@@ -36,7 +36,7 @@ Get the general layout of a location with the static map generator "mapme" comma
 *******************************************************************************
 
 By default NavBuddy makes results only visible to you, but if you want to plan
-ahead with friends, or feel like sharing with everyone, end the command with
+ahead with friends, or just feel like sharing with everyone, end the command with
 "all" and the results will be sent publicly to the channel:
   /etadriveall
   /walkall
