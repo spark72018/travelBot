@@ -193,7 +193,7 @@ app.post('/:command', function(req, res) { //add option to get geocodes? too muc
         reqObj.traffic_model = 'best_guess';
         reqObj.origin = start;
         reqObj.destination = finish;
-
+        //https://maps.googleapis.com/maps/api/directions/json?
         //googleMapsClient.directions(reqObj).asPromise()
         myPromise('directions')(reqObj)
 
@@ -202,6 +202,16 @@ app.post('/:command', function(req, res) { //add option to get geocodes? too muc
               distanceText = 'Distance: ' + route.distance.text + '\n',
               durationText,
               resultString;
+          console.log(result.json);
+
+          if(route.steps.length > 20) {
+            var redirectUrl ='Directions were too long! Just so we don\'t spam your channel, here\'s a directions link: ' + '\n\n' +
+            'https://www.google.com/maps/dir/' +
+            splitted[0].trim().replace(/\s/g, '+') + '/' +
+            splitted[1].trim().replace(/\s/g, '+');
+
+            res.send(sendAway(redirectUrl));
+          }
 
           if(cmdSplit[0] === 'driving') {
             durationText = 'ETA: ' + route.duration_in_traffic.text + ' (in current traffic)' + '\n\n';
