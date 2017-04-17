@@ -81,8 +81,8 @@ app.get('/slack', function(req, res) {
 //Create database entry for save command
 app.post('/save', function(req, res) {
   var split = req.body.text.split(" > ");
-  var locationName = split[0];
-  var address = split[1];
+  var locationName = split[0].toLowerCase();
+  var address = split[1].toLowerCase();
   var regex = /\d+\s+([a-zA-Z]+|[a-zA-Z]+\s[a-zA-Z]+)/g;
 
   console.log("location name = " + locationName);
