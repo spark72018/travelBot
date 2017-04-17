@@ -10,10 +10,10 @@ var express = require('express'),
       key: apiKey,
       Promise: Promise
     });
-
+/*
 var URL = process.env.DATABASEURL || "mongodb://localhost/navbuddy";
 mongoose.connect(URL);
-
+*/
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
@@ -45,6 +45,20 @@ var properSend = function(publicOrNot) {
     }else {
       return setInfo(param1, param2).away();
     }
+  }
+};
+
+var myPromise = function(fn) {
+  if(fn === 'geo') {
+    return  function(address) {
+        return googleMapsClient.geocode({address: address}).asPromise();
+      }
+  }else if(fn === 'directions') {
+    return function(obj) {
+        return googleMapsClient.directions(reqObj).asPromise();
+      }
+  }else {
+    console.log("myPromise only takes 'geo' or 'directions'!");
   }
 };
 
@@ -163,13 +177,9 @@ app.post('/:command', function(req, res) { //add option to get geocodes? too muc
       //to see what user response gets split to
       console.log('splitted is ', splitted);
 
-      var p1 = googleMapsClient.geocode({
-        address: splitted[0]
-      }).asPromise();
+      var p1 = myPromise('geo')(splitted[0]);
 
-      var p2 = googleMapsClient.geocode({
-        address: splitted[1]
-      }).asPromise();
+      var p2 = myPromise('geo')(splitted[1]);
 
       var p3 = Promise.all([p1, p2])
 
@@ -184,7 +194,8 @@ app.post('/:command', function(req, res) { //add option to get geocodes? too muc
         reqObj.origin = start;
         reqObj.destination = finish;
 
-        googleMapsClient.directions(reqObj).asPromise()
+        //googleMapsClient.directions(reqObj).asPromise()
+        myPromise('directions')(reqObj)
 
         .then(function(result) {
           var route = result.json.routes[0].legs[0],
