@@ -11,8 +11,8 @@ var express = require('express'),
       Promise: Promise
     });
 
-var URL = process.env.DATABASEURL || "mongodb://localhost/navbuddy"; 
-mongoose.connect(URL);   
+var URL = process.env.DATABASEURL || "mongodb://localhost/navbuddy";
+mongoose.connect(URL);
 
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
@@ -99,7 +99,7 @@ app.post('/save', function(req, res) {
     };
     SavedLocations.find({userId: req.body.user_id, teamId: req.body.team_id, name: locationName}, function(err, foundthing) {
       console.log(foundthing);
-     
+
       if (foundthing.length > 0) {
         SavedLocations.findByIdAndUpdate(foundthing[0]._id, {$set: {address: address}}, {new: true}, function(err, updated) {
           console.log(updated);
@@ -124,31 +124,6 @@ app.post('/save', function(req, res) {
     }
 });
 
-
-/*
-MapMe Commands available commands so far:
-  /drive
-  /walk
-  /bike
-  /transit
-  /mapme
-  /mapmeall (test public slash command)
-  /etadrive (test eta slash command)
-  /maphelp (didn't let me make /help)
-
--adding "all" to command will add "_all" to post url
--eta commands will add "_eta" to post url
-
-  /mapme address
-  /mapmeall address
-
-  NavPal? (/npwalk, /npdrive np ~ "No Problem") MapPal?(/mpwalk, /mphelp) MaPal? (same)
-  /npwalk address1 > address2
-  /npwalkall address1 > address2
-
-  /np address (static image)
-  /npall address (static image)
-*/
 
 app.post('/:command', function(req, res) { //add option to get geocodes? too much?
   var command = req.params.command,
