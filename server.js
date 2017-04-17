@@ -174,7 +174,6 @@ app.post('/:command', function(req, res) { //add option to get geocodes? too muc
       }else { //if user uses /mapme with two addresses, send static image with polyline and markers
         var formattedAddress1 = splitted[0].trim().replace(/\s/g, '+');
         var formattedAddress2 = splitted[1].trim().replace(/\s/g, '+');
-        console.log('splitted is ', splitted);
         var firstGeo = myPromise('geo')(splitted[0]);
         var secondGeo = myPromise('geo')(splitted[1]);
         var reqObj = {};
@@ -182,30 +181,31 @@ app.post('/:command', function(req, res) { //add option to get geocodes? too muc
         var catchUp = Promise.all([firstGeo, secondGeo]);
 
         catchUp.then(function(geo) {
+          console.log(geo[0], geo[1]);
           reqObj.departure_time = new Date;
           reqObj.traffic_model = 'best_guess';
-          reqObj.origin = geo[0];
-          reqObj.destination = geo[1];
+          reqObj.origin = geo[0].json.results[0].geometry.location;
+          reqObj.destination = geo[1].json.results[0].geometry.location;
+          console.log(reqObj);
 
           myPromise('directions')(reqObj)
 
           .then(function(result) {
-            //poly = result.json.routes[0].overview_polyline
-            console.log(result.json.routes[0]);
+            poly = result.json.routes[0].overview_polyline.points;
+            var url = "https://maps.googleapis.com/maps/api/staticmap?size=600x400&markers="+
+            formattedAddress1 + '|' + formattedAddress2 +
+            '&path=weight:6%7Ccolor:blue%7Cenc:' + poly;
+            console.log(url);
+            var attachObj = [
+              {
+                "title": input,
+                "title_link": "https://www.google.com/maps/dir/" + formattedAddress1 + '/' + formattedAddress2,
+                image_url: url
+              }
+            ];
+            res.send(sendAway(attachObj));
           });
         });
-
-        var url = "https://maps.googleapis.com/maps/api/staticmap?size=600x400&markers="+
-        formattedAddress1 + '|' + formattedAddress2 +
-        '&path=weight:6%7Ccolor:blue%7Cenc:' + poly;
-        var attachObj = [
-          {
-            "title": input,
-            "title_link": "https://www.google.com/maps/dir/" + formattedAddress1 + '/' + formattedAddress2,
-            image_url: url
-          }
-        ];
-        res.send(sendAway(attachObj));
       }
     } else if (splitted.length === 2) {
       //timestamp console.log to easily discern app startup in logs
