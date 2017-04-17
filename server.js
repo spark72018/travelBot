@@ -55,7 +55,7 @@ var myPromise = function(fn) {
       }
   }else if(fn === 'directions') {
     return function(obj) {
-        return googleMapsClient.directions(reqObj).asPromise();
+        return googleMapsClient.directions(obj).asPromise();
       }
   }else {
     console.log("myPromise only takes 'geo' or 'directions'!");
