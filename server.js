@@ -158,18 +158,55 @@ app.post('/:command', function(req, res) { //add option to get geocodes? too muc
   //Start of regex test for address input
   if (regex.test(input)) {
       //  /mapme will send post request to homepage/image
-    if(splitted.length === 1 && cmdSplit[0] === "image") {
-      var formattedInput = input.replace(/\s/g, '+');
-      console.log('formattedInput = ' + formattedInput);
-      var url = "https://maps.googleapis.com/maps/api/staticmap?center="+formattedInput+"&size=600x400&markers="+formattedInput;
-      var attachObj = [
-        {
-          "title": input,
-          "title_link": "http://maps.google.com/maps?f=d&source=s_d&saddr=&daddr="+formattedInput,
-          image_url: url
-        }
-      ];
-      res.send(sendAway(attachObj));
+    if(cmdSplit[0] === "image") {
+      if(splitted.length === 1) {
+        var formattedInput = input.replace(/\s/g, '+');
+        console.log('formattedInput = ' + formattedInput);
+        var url = "https://maps.googleapis.com/maps/api/staticmap?center="+formattedInput+"&size=600x400&markers="+formattedInput;
+        var attachObj = [
+          {
+            "title": input,
+            "title_link": "http://maps.google.com/maps?f=d&source=s_d&saddr=&daddr="+formattedInput,
+            image_url: url
+          }
+        ];
+        res.send(sendAway(attachObj));
+      }else { //if user uses /mapme with two addresses, send static image with polyline and markers
+        var formattedAddress1 = splitted[0].trim().replace(/\s/g, '+');
+        var formattedAddress2 = splitted[1].trim().replace(/\s/g, '+');
+        console.log('splitted is ', splitted);
+        var firstGeo = myPromise('geo')(splitted[0]);
+        var secondGeo = myPromise('geo')(splitted[1]);
+        var reqObj = {};
+        var poly;
+        var catchUp = Promise.all([firstGeo, secondGeo]);
+
+        catchUp.then(function(geo) {
+          reqObj.departure_time = new Date;
+          reqObj.traffic_model = 'best_guess';
+          reqObj.origin = geo[0];
+          reqObj.destination = geo[1];
+
+          myPromise('directions')(reqObj)
+
+          .then(function(result) {
+            //poly = result.json.routes[0].overview_polyline
+            console.log(result.json.routes[0]);
+          });
+        });
+
+        var url = "https://maps.googleapis.com/maps/api/staticmap?size=600x400&markers="+
+        formattedAddress1 + '|' + formattedAddress2 +
+        '&path=weight:6%7Ccolor:blue%7Cenc:' + poly;
+        var attachObj = [
+          {
+            "title": input,
+            "title_link": "https://www.google.com/maps/dir/" + formattedAddress1 + '/' + formattedAddress2,
+            image_url: url
+          }
+        ];
+        res.send(sendAway(attachObj));
+      }
     } else if (splitted.length === 2) {
       //timestamp console.log to easily discern app startup in logs
       console.log(new Date().toLocaleString());
@@ -186,7 +223,7 @@ app.post('/:command', function(req, res) { //add option to get geocodes? too muc
       .then(function(values) {
         start = values[0].json.results[0].geometry.location;
         finish = values[1].json.results[0].geometry.location;
-
+        var reqObj = {};
         //mode values = 'driving', 'walking', 'bicycling', 'transit'
         reqObj.mode = cmdSplit[0];
         reqObj.departure_time = new Date;
@@ -202,7 +239,6 @@ app.post('/:command', function(req, res) { //add option to get geocodes? too muc
               distanceText = 'Distance: ' + route.distance.text + '\n',
               durationText,
               resultString;
-          console.log(result.json);
 
           if(route.steps.length > 20) {
             var redirectUrl ='Directions were too long! Just so we don\'t spam your channel, here\'s a directions link: ' + '\n\n' +
