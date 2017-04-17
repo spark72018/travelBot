@@ -10,6 +10,4 @@ const locationSchema = new Schema({
 	address: String
 });
 
-const ModelClass = mongoose.model("savedLocations", locationSchema);
-
-module.exports = ModelClass;
+module.exports = mongoose.model("SavedLocations", locationSchema);

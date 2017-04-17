@@ -1,7 +1,7 @@
 var express = require('express'),
     bodyParser = require('body-parser'),
     mongoose = require('mongoose'),
-    savedLocations = require("./models/savedLocations"),
+    SavedLocations = require("./models/savedLocations"),
     request = require('request'),
     //urlencodedParser = bodyParser.urlencoded({extended: false}),
     app = express(),
@@ -11,6 +11,9 @@ var express = require('express'),
       key: apiKey,
       Promise: Promise
     });
+
+var URL = process.env.DATABASEURL || "mongodb://localhost/navbuddy"; 
+mongoose.connect(URL);   
 
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
@@ -77,7 +80,7 @@ app.get('/slack', function(req, res) {
 
 //Create database entry for save command
 app.post('/save', function(req, res) {
-  var split = req.body.text.split(">");
+  var split = req.body.text.split(" > ");
   var locationName = split[0];
   var address = split[1];
   var regex = /\d+\s+([a-zA-Z]+|[a-zA-Z]+\s[a-zA-Z]+)/g;
@@ -85,7 +88,8 @@ app.post('/save', function(req, res) {
   console.log("location name = " + locationName);
   console.log("address = " + address);
 
-  if (regex.test(address) && locationName !== "") {
+
+  if (regex.test(address)) {
     var data = {
       userName: req.body.user_name,
       userId: req.body.user_id,
@@ -94,16 +98,30 @@ app.post('/save', function(req, res) {
       name: locationName,
       address: address
     };
-    savedLocations.create(data, function(error, location) {
-      console.log(location);
-      res.send({
-        "text": "Location saved!",
-      });
+    SavedLocations.find({userId: req.body.user_id, teamId: req.body.team_id, name: locationName}, function(err, foundthing) {
+      console.log(foundthing);
+     
+      if (foundthing.length > 0) {
+        SavedLocations.findByIdAndUpdate(foundthing[0]._id, {$set: {address: address}}, {new: true}, function(err, updated) {
+          console.log(updated);
+          res.send("Updated");
+        });
+      } else {
+          SavedLocations.create(data, function(error, location) {
+          console.log(location);
+          res.send({
+            "text": "Location saved!",
+          });
+        });
+      }
     });
+
+    console.log("Success!");
   } else {
       res.send({
         "text": "Enter a valid address!",
       });
+      console.log("FAIL");
     }
 });
 
