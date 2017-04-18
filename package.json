@@ -14,7 +14,7 @@
     "body-parser": "^1.17.1",
     "express": "^4.15.2",
     "mongodb": "^2.2.25",
-    "mongoose": "^4.9.4",
+    "mongoose": "^4.9.5",
     "ngrok": "^2.2.6",
     "request": "^2.81.0"
   }

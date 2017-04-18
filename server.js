@@ -3,7 +3,6 @@ var express = require('express'),
     mongoose = require('mongoose'),
     SavedLocations = require("./models/savedLocations"),
     request = require('request'),
-    //urlencodedParser = bodyParser.urlencoded({extended: false}),
     app = express(),
     apiKey = process.env.MAPKEY,
     slackEnvToken = process.env.SLACKTOKEN,
@@ -11,10 +10,10 @@ var express = require('express'),
       key: apiKey,
       Promise: Promise
     });
-
-var URL = process.env.DATABASEURL || "mongodb://localhost/navbuddy"; 
-mongoose.connect(URL);   
-
+/*
+var URL = process.env.DATABASEURL || "mongodb://localhost/navbuddy";
+mongoose.connect(URL);
+*/
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
@@ -46,6 +45,20 @@ var properSend = function(publicOrNot) {
     }else {
       return setInfo(param1, param2).away();
     }
+  }
+};
+
+var myPromise = function(fn) {
+  if(fn === 'geo') {
+    return  function(address) {
+        return googleMapsClient.geocode({address: address}).asPromise();
+      }
+  }else if(fn === 'directions') {
+    return function(obj) {
+        return googleMapsClient.directions(obj).asPromise();
+      }
+  }else {
+    console.log("myPromise only takes 'geo' or 'directions'!");
   }
 };
 
@@ -100,7 +113,7 @@ app.post('/save', function(req, res) {
     };
     SavedLocations.find({userId: req.body.user_id, teamId: req.body.team_id, name: locationName}, function(err, foundthing) {
       console.log(foundthing);
-     
+
       if (foundthing.length > 0) {
         SavedLocations.findByIdAndUpdate(foundthing[0]._id, {$set: {address: address}}, {new: true}, function(err, updated) {
           console.log(updated);
@@ -126,31 +139,6 @@ app.post('/save', function(req, res) {
 });
 
 
-/*
-MapMe Commands available commands so far:
-  /drive
-  /walk
-  /bike
-  /transit
-  /mapme
-  /mapmeall (test public slash command)
-  /etadrive (test eta slash command)
-  /maphelp (didn't let me make /help)
-
--adding "all" to command will add "_all" to post url
--eta commands will add "_eta" to post url
-
-  /mapme address
-  /mapmeall address
-
-  NavPal? (/npwalk, /npdrive np ~ "No Problem") MapPal?(/mpwalk, /mphelp) MaPal? (same)
-  /npwalk address1 > address2
-  /npwalkall address1 > address2
-
-  /np address (static image)
-  /npall address (static image)
-*/
-
 app.post('/:command', function(req, res) { //add option to get geocodes? too much?
   var command = req.params.command,
       input = req.body.text,
@@ -170,18 +158,55 @@ app.post('/:command', function(req, res) { //add option to get geocodes? too muc
   //Start of regex test for address input
   if (regex.test(input)) {
       //  /mapme will send post request to homepage/image
-    if(splitted.length === 1 && cmdSplit[0] === "image") {
-      var formattedInput = input.replace(/\s/g, '+');
-      console.log('formattedInput = ' + formattedInput);
-      var url = "https://maps.googleapis.com/maps/api/staticmap?center="+formattedInput+"&size=600x400&markers="+formattedInput;
-      var attachObj = [
-        {
-          "title": input,
-          "title_link": "http://maps.google.com/maps?f=d&source=s_d&saddr=&daddr="+formattedInput,
-          image_url: url
-        }
-      ];
-      res.send(sendAway(attachObj));
+    if(cmdSplit[0] === "image") {
+      if(splitted.length === 1) {
+        var formattedInput = input.replace(/\s/g, '+');
+        console.log('formattedInput = ' + formattedInput);
+        var url = "https://maps.googleapis.com/maps/api/staticmap?center="+formattedInput+"&size=600x400&markers="+formattedInput;
+        var attachObj = [
+          {
+            "title": input,
+            "title_link": "http://maps.google.com/maps?f=d&source=s_d&saddr=&daddr="+formattedInput,
+            image_url: url
+          }
+        ];
+        res.send(sendAway(attachObj));
+      }else { //if user uses /mapme with two addresses, send static image with polyline and markers
+        var formattedAddress1 = splitted[0].trim().replace(/\s/g, '+');
+        var formattedAddress2 = splitted[1].trim().replace(/\s/g, '+');
+        var firstGeo = myPromise('geo')(splitted[0]);
+        var secondGeo = myPromise('geo')(splitted[1]);
+        var reqObj = {};
+        var poly;
+        var catchUp = Promise.all([firstGeo, secondGeo]);
+
+        catchUp.then(function(geo) {
+          console.log(geo[0], geo[1]);
+          reqObj.departure_time = new Date;
+          reqObj.traffic_model = 'best_guess';
+          reqObj.origin = geo[0].json.results[0].geometry.location;
+          reqObj.destination = geo[1].json.results[0].geometry.location;
+          console.log(reqObj);
+
+          myPromise('directions')(reqObj)
+
+          .then(function(result) {
+            poly = result.json.routes[0].overview_polyline.points;
+            var url = "https://maps.googleapis.com/maps/api/staticmap?size=600x400&markers="+
+            formattedAddress1 + '|' + formattedAddress2 +
+            '&path=weight:6%7Ccolor:blue%7Cenc:' + poly;
+            console.log(url);
+            var attachObj = [
+              {
+                "title": input,
+                "title_link": "https://www.google.com/maps/dir/" + formattedAddress1 + '/' + formattedAddress2,
+                image_url: url
+              }
+            ];
+            res.send(sendAway(attachObj));
+          });
+        });
+      }
     } else if (splitted.length === 2) {
       //timestamp console.log to easily discern app startup in logs
       console.log(new Date().toLocaleString());
@@ -189,34 +214,40 @@ app.post('/:command', function(req, res) { //add option to get geocodes? too muc
       //to see what user response gets split to
       console.log('splitted is ', splitted);
 
-      var p1 = googleMapsClient.geocode({
-        address: splitted[0]
-      }).asPromise();
+      var p1 = myPromise('geo')(splitted[0]);
 
-      var p2 = googleMapsClient.geocode({
-        address: splitted[1]
-      }).asPromise();
+      var p2 = myPromise('geo')(splitted[1]);
 
       var p3 = Promise.all([p1, p2])
 
       .then(function(values) {
         start = values[0].json.results[0].geometry.location;
         finish = values[1].json.results[0].geometry.location;
-
+        var reqObj = {};
         //mode values = 'driving', 'walking', 'bicycling', 'transit'
         reqObj.mode = cmdSplit[0];
         reqObj.departure_time = new Date;
         reqObj.traffic_model = 'best_guess';
         reqObj.origin = start;
         reqObj.destination = finish;
-
-        googleMapsClient.directions(reqObj).asPromise()
+        //https://maps.googleapis.com/maps/api/directions/json?
+        //googleMapsClient.directions(reqObj).asPromise()
+        myPromise('directions')(reqObj)
 
         .then(function(result) {
           var route = result.json.routes[0].legs[0],
               distanceText = 'Distance: ' + route.distance.text + '\n',
               durationText,
               resultString;
+
+          if(route.steps.length > 20) {
+            var redirectUrl ='Directions were too long! Just so we don\'t spam your channel, here\'s a directions link: ' + '\n\n' +
+            'https://www.google.com/maps/dir/' +
+            splitted[0].trim().replace(/\s/g, '+') + '/' +
+            splitted[1].trim().replace(/\s/g, '+');
+
+            res.send(sendAway(redirectUrl));
+          }
 
           if(cmdSplit[0] === 'driving') {
             durationText = 'ETA: ' + route.duration_in_traffic.text + ' (in current traffic)' + '\n\n';
