@@ -51,7 +51,7 @@ var properSend = function(publicOrNot) {
 
 
 //Auth
-app.get('/slack', function(req, res) {
+app.get('/auth', function(req, res) {
   var data = {form: {
       client_id: process.env.SLACK_CLIENT_ID,
       client_secret: process.env.SLACK_CLIENT_SECRET,
