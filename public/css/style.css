@@ -75,7 +75,10 @@ a.add-btn:focus {
 	font-size: 22px;
 }
 .main .row {
-	margin: 150px 0;
+	margin: 80px 0;
+}
+.main:nth-child(odd) {
+	background-color: #e5e3e7;
 }
 .command {
 	background-color: #fff;
