@@ -101,7 +101,7 @@ app.post('/save', function(req, res) {
   console.log("location name = " + locationName);
   console.log("address = " + address);
 
-
+  //Regex test
   if (regex.test(address)) {
     var data = {
       userName: req.body.user_name,
@@ -111,15 +111,19 @@ app.post('/save', function(req, res) {
       name: locationName,
       address: address
     };
-    SavedLocations.find({userId: req.body.user_id, teamId: req.body.team_id, name: locationName}, function(err, foundthing) {
-      console.log(foundthing);
+    //Check if location already exists first
+    SavedLocations.find({userId: req.body.user_id, teamId: req.body.team_id, name: locationName}, function(err, existingLocation) {
+      console.log(existingLocation);
 
-      if (foundthing.length > 0) {
-        SavedLocations.findByIdAndUpdate(foundthing[0]._id, {$set: {address: address}}, {new: true}, function(err, updated) {
+      //If already exists, update it
+      if (existingLocation.length > 0) {
+        SavedLocations.findByIdAndUpdate(existingLocation[0]._id, {$set: {address: address}}, {new: true}, function(err, updated) {
           console.log(updated);
-          res.send("Updated");
+          res.send({
+            "text": "Location updated!"
+          });
         });
-      } else {
+      } else { //If not, create it
           SavedLocations.create(data, function(error, location) {
           console.log(location);
           res.send({
