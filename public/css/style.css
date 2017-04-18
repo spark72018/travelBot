@@ -75,18 +75,18 @@ a.add-btn:focus {
 	font-size: 22px;
 }
 .main .row {
-	margin: 80px 0;
+	margin: 110px 0;
 }
-.main:nth-child(odd) {
+/*.main:nth-child(odd) {
 	background-color: #e5e3e7;
-}
+}*/
 .command {
 	background-color: #fff;
 	text-align: left;
 	padding: 10px;
 	border-radius: 5px;
 	border: 1.5px solid #ccc;
-	margin-top: 20px;
+	margin-bottom: 20px;
 }
 .command p {
 	color: #2e2c2b;
@@ -106,9 +106,7 @@ a.add-btn:focus {
     margin-top: 15px;
     color: #fff;
 }
-.text-left {
-	text-align: left!important;
-}
+
 @media (max-width: 767px) {
 	.description {
 		display: block;
