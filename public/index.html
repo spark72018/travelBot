@@ -9,7 +9,7 @@
 	  <meta name="description" content="Slack bot that lets you get directions and map locations without leaving your chats">
 	  <link rel="stylesheet prefetch" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
 	  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-	  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Work+Sans:300,400,500">
+	  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins:300,400,500">
 	  <link rel="icon" href="favicon.ico" type="image/x-icon" />
 	  <link rel="stylesheet" href="css/style.css">
 	</head>
@@ -41,80 +41,78 @@
 		</div>
 		<div class="container-fluid main">
 			<div class="row">
-				<h3>Available commands:</h3>
 				<div class="col-md-5 col-md-offset-1">
-					<div class="command">
-						<p><strong>/drive</strong> [Start Adress] > [Finish Address]</p>
+					<h3>Available commands:</h3>
+					<div class="command-container">
+						<p><span class="command">/drive</span> [Start Adress] > [Finish Address]</p>
 					</div>
-					<div class="command">
-						<p><strong>/walk</strong> [Start Adress] > [Finish Address]</p>
+					<div class="command-container">
+						<p><span class="command">/walk</span> [Start Adress] > [Finish Address]</p>
 					</div>
-					<div class="command">
-						<p><strong>/bike</strong> [Start Adress] > [Finish Address]</p>
+					<div class="command-container">
+						<p><span class="command">/bike</span> [Start Adress] > [Finish Address]</p>
 					</div>
-					<div class="command">
-						<p><strong>/transit</strong> [Start Adress] > [Finish Address]</p>
+					<div class="command-container">
+						<p><span class="command">/transit</span> [Start Adress] > [Finish Address]</p>
 					</div>
-					<div class="command">
-						<p><strong>/mapme</strong> [Address]</p>
+					<div class="command-container">
+						<p><span class="command">/mapme</span> [Address]</p>
 					</div>
-					<div class="command">
-						<p><strong>/save</strong> [Label] > [Address]</p>
+					<div class="command-container">
+						<p><span class="command">/save</span> [Label] > [Address]</p>
 					</div>
 				</div>
 				<div class="col-md-5" style="background-color: grey; height: 450px;"></div>
 			</div>
 			<div class="row">
-				<h3>Choose your favorite way to travel with our directions commands:</h3>
+				<h3 class="text-center">Choose your favorite way to travel with our directions commands:</h3>
 				<div class="col-md-5 col-md-offset-1">
-					<div class="command">
-						<p>/drive</p>
+					<div class="command-container">
+						<p><span class="command">/drive</span></p>
 					</div>
-					<div class="command">
-						<p>/walk</p>
+					<div class="command-container">
+						<p><span class="command">/walk</span></p>
 					</div>
 				</div>
 				<div class="col-md-5">
-					<div class="command">
-						<p>/bike</p>
+					<div class="command-container">
+						<p><span class="command">/bike</span></p>
 					</div>
-					<div class="command">
-						<p>/transit</p>
+					<div class="command-container">
+						<p><span class="command">/transit</span></p>
 					</div>
 				</div>
 			</div>
 			<div class="row">	
-			<h3>To use, just type your <strong>Start</strong> and <strong>Finish</strong> addresses separated by a ">":</h3>
 				<div class="col-md-5 col-md-offset-1" style="background-color: grey; height: 400px;">
 					
 				</div>	
 				<div class="col-md-5">
-					<div class="command">
-						<p>/bike [Start] > [Finish]</p>
+					<h3>To use, just type your <strong>Start</strong> and <strong>Finish</strong> addresses separated by a ">":</h3>
+					<div class="command-container">
+						<p><span class="command">/bike</span> [Start] > [Finish]</p>
 					</div>
 				</div>	
 			</div>
 			<div class="row">
-				<h3>Or, if you want to get the general layout of a location, use our static map generator <strong>/mapme</strong> command:</h3>
 				<div class="col-md-5 col-md-offset-1">
-					<div class="command">
-						<p>/mapme [Address]</p>
+					<h3>Use our static map generator <strong>/mapme</strong> command to get the general layout of a location:</h3>
+					<div class="command-container">
+						<p><span class="command">/mapme</span> [Address]</p>
 					</div>
 				</div>	
 				<div class="col-md-5" style="background-color: grey; height: 400px;"></div>
 			</div>
 			<div class="row">
-				
-					<h3>If there's an address you use a lot, save time with NavBuddy's <strong>/save</strong> command!<br/>The next time you want to use it, just use the label you gave it:</h3>
-					<div class="col-md-5 col-md-offset-1" style="background-color: grey; height: 400px;">
+				<div class="col-md-5 col-md-offset-1" style="background-color: grey; height: 400px;">
 
-					</div>
-					<div class="col-md-5">
-						<div class="command">
-							<p>/save [Name] > [Address]</p>
-						</div>	
-					</div>
-					
+				</div>
+				<div class="col-md-5">
+					<h3>If there's an address you use a lot, save time with NavBuddy's <strong>/save</strong> command! The next time you want to use it, just use the label you gave it:</h3>
+					<div class="command-container">
+						<p><span class="command">/save</span> [Label] > [Address]</p>
+					</div>	
+				</div>	
 			</div>
 		</div>
 		<div class="container-fluid footer">

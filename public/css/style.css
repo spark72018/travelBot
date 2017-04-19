@@ -1,6 +1,6 @@
 body {
-	font-family: 'Work Sans', sans-serif;
-	color: #fff;
+	font-family: 'Poppins', sans-serif;
+	color: #2a313e;
 	text-align: center;
 	background-color: #52c2a0;
     background-attachment: fixed;
@@ -20,7 +20,6 @@ body {
 .logo-header h1 {
 	display: table-cell;
 	vertical-align: middle;
-	color: #fff;
 	font-size: 50px;
 }
 .logo-img {
@@ -36,6 +35,7 @@ body {
 .logo-header h1,
 .landing h4 {
 	text-shadow: 2px 3px 13px #787e7c;
+	color: #fff;
 }
 .add-btn {
 	font-size: 18px;
@@ -67,12 +67,13 @@ a.add-btn:focus {
 	background-color: #fff;
 }
 .main h3 {
-	color: #818281;
 	margin-top: 0;
-	margin-bottom: 30px;
-	text-align: center;
+	margin-bottom: 40px;
+	text-align: left;
 	font-weight: 300;
-	font-size: 22px;
+	font-size: 26px;
+	font-weight: 500;
+	line-height: 1.3;
 }
 .main .row {
 	margin: 110px 0;
@@ -80,7 +81,7 @@ a.add-btn:focus {
 /*.main:nth-child(odd) {
 	background-color: #e5e3e7;
 }*/
-.command {
+.command-container {
 	background-color: #fff;
 	text-align: left;
 	padding: 10px;
@@ -88,16 +89,20 @@ a.add-btn:focus {
 	border: 1.5px solid #ccc;
 	margin-bottom: 20px;
 }
-.command p {
-	color: #2e2c2b;
+.command-container p {
+	color: #3a4251;
 	font-size: 22px;
-	font-weight: 400;
+	font-weight: 300;
+}
+.command {
+	font-weight: 500;
 }
 .footer {
 	background-color: #2b302e;
 	padding: 20px 0;
+	color: #fff;
 }
-.command p,
+.command-container p,
 .footer p {
 	margin: 0;
 }
@@ -106,7 +111,9 @@ a.add-btn:focus {
     margin-top: 15px;
     color: #fff;
 }
-
+.text-center {
+	text-align: center!important;
+}
 @media (max-width: 767px) {
 	.description {
 		display: block;
