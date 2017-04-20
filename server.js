@@ -17,6 +17,9 @@ mongoose.connect(URL);
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
+//Connect to db
+mongoose.connect(process.env.MONGOLAB_URI || "mongodb://localhost/shortUrl");
+
 var setInfo = function(str, attachment, toChannel) {
   var store = {}, type, i;
 
