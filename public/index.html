@@ -33,14 +33,14 @@
 					<h1><strong>Nav</strong>Buddy</h1>
 				</div>
 				<h4>Get maps, directions, and traffic info delivered straight to your Slack channel</h4>
-				<a href="https://slack.com/oauth/authorize?scope=commands&client_id=158595057431.159639634629" class="add-btn" target="_blank">
+				<a href="https://slack.com/oauth/authorize?scope=commands&client_id=1158595057431.171801951012" class="add-btn" target="_blank">
 					<img src="images/white-slack-icon.png"/>
 					Add to Slack
 				</a>
 			</div>
 		</div>
 		<div class="container-fluid main">
-			<div class="row">
+			<div class="row main-section">
 				<div class="col-md-5 col-md-offset-1">
 					<h3>Available commands:</h3>
 					<div class="command-container">
@@ -62,57 +62,58 @@
 						<p><span class="command">/save</span> [Label] > [Address]</p>
 					</div>
 				</div>
-				<div class="col-md-5" style="background-color: grey; height: 450px;"></div>
+				<div class="col-md-5">
+					<img src="images/slack-bot.png" class="img-responsive slack-img">
+				</div>
 			</div>
-			<div class="row">
-				<h3 class="text-center">Choose your favorite way to travel with our directions commands:</h3>
+			<div class="row main-section">	
 				<div class="col-md-5 col-md-offset-1">
-					<div class="command-container">
-						<p><span class="command">/drive</span></p>
-					</div>
-					<div class="command-container">
-						<p><span class="command">/walk</span></p>
-					</div>
-				</div>
-				<div class="col-md-5">
-					<div class="command-container">
-						<p><span class="command">/bike</span></p>
-					</div>
-					<div class="command-container">
-						<p><span class="command">/transit</span></p>
-					</div>
-				</div>
-			</div>
-			<div class="row">	
-				<div class="col-md-5 col-md-offset-1" style="background-color: grey; height: 400px;">
-					
+					<img src="" class="img-responsive slack-img" style="background-color: grey; height: 400px;">
 				</div>	
 				<div class="col-md-5">
-					<h3>To use, just type your <strong>Start</strong> and <strong>Finish</strong> addresses separated by a ">":</h3>
+					<h4>To use our directions commands, just type the command with the mode of transportation you want to use, followed by your <strong>Start</strong> and <strong>Finish</strong> addresses separated with a ">":</h4>
 					<div class="command-container">
-						<p><span class="command">/bike</span> [Start] > [Finish]</p>
+						<p><span class="command">/bike</span> 123 N Main St > 456 S Main St</p>
+					</div>
+					<h4>To get the general layout of a location, use our static map generator <strong>/mapme</strong> command followed by the address:</h4>
+					<div class="command-container">
+						<p><span class="command">/mapme</span> 123 N Main St</p>
 					</div>
 				</div>	
 			</div>
-			<div class="row">
+<!-- 			<div class="row main-section">
 				<div class="col-md-5 col-md-offset-1">
 					<h3>Use our static map generator <strong>/mapme</strong> command to get the general layout of a location:</h3>
 					<div class="command-container">
 						<p><span class="command">/mapme</span> [Address]</p>
 					</div>
 				</div>	
-				<div class="col-md-5" style="background-color: grey; height: 400px;"></div>
-			</div>
-			<div class="row">
-				<div class="col-md-5 col-md-offset-1" style="background-color: grey; height: 400px;">
-
-				</div>
 				<div class="col-md-5">
-					<h3>If there's an address you use a lot, save time with NavBuddy's <strong>/save</strong> command! The next time you want to use it, just use the label you gave it:</h3>
+					<img src="" class="img-responsive slack-img" style="background-color: grey; height: 400px;">
+				</div>
+			</div> -->
+			<div class="row main-section">
+				<div class="col-md-5  col-md-offset-1">
+					<h4>If there's an address you use a lot, save time with NavBuddy's <strong>/save</strong> command! Just type the save command followed by the label and the address separated with a ">":</h4>
 					<div class="command-container">
-						<p><span class="command">/save</span> [Label] > [Address]</p>
+						<p><span class="command">/save</span> work > 456 S Main St</p>
+					</div>	
+					<h4>The next time you want to use it with any of our commands, just use the label you gave it:</h4>
+					<div class="command-container">
+						<p><span class="command">/drive</span> work > home</p>
 					</div>	
 				</div>	
+				<div class="col-md-5">
+					<img src="" class="img-responsive slack-img" style="background-color: grey; height: 400px;">
+				</div>	
+			</div>
+		</div>
+		<div class="container-fluid cta-container">
+			<div class="row">
+				<a href="https://slack.com/oauth/authorize?scope=commands&client_id=158595057431.159639634629" class="add-btn" target="_blank">
+					<img src="images/white-slack-icon.png"/>
+					Add to Slack
+				</a>
 			</div>
 		</div>
 		<div class="container-fluid footer">
@@ -121,6 +122,18 @@
 				<a href="https://github.com/spark72018/travelBot" target="_blank"><i class="fa fa-github" aria-hidden="true"></i></a>
 			</div>
 		</div>
+
+		<!-- back to top btn -->
+		<div class="back-to-top">
+			<a href="">
+				<i class="fa fa-chevron-up" aria-hidden="true"></i>
+				TOP
+			</a>
+		</div>
+
+		<!-- scripts -->
+		<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js'></script>
+		<script src="js/index.js"></script>
 	</body>
 </html>
 
