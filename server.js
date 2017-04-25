@@ -93,6 +93,22 @@ app.get('/auth', function(req, res) {
   })
 });
 
+app.post('/mylocations', function(req, res) {
+  //retrieve from db using Mongoose
+  console.log(req.body);
+  var teamID = req.body.team_id;
+  var userID = req.body.user_id;
+  SavedLocations.find({userId: userID, teamId: teamID}, function(err, foundLoc) {
+    console.log(foundLoc);
+    var loc = foundLoc.locations;
+        // WHEN CONSTRUCTING THE INTERACTIVE MESSAGE
+          // list name and address
+          // button VALUE will be mongoose id, so we can find in db
+          // then delete from db using that id/value
+    res.send("SUCCESS");
+  });
+});
+
 
 //Create database entry for save command
 app.post('/save', function(req, res) {
@@ -106,27 +122,42 @@ app.post('/save', function(req, res) {
 
   //Regex test
   if (regex.test(address)) {
-    var data = {
-      userName: req.body.user_name,
-      userId: req.body.user_id,
-      teamId: req.body.team_id,
-      channelId: req.body.channel_id,
-      name: locationName,
-      address: address
-    };
     //Check if location already exists first
-    SavedLocations.find({userId: req.body.user_id, teamId: req.body.team_id, name: locationName}, function(err, existingLocation) {
-      console.log(existingLocation);
-
+    SavedLocations.find({userId: req.body.user_id, teamId: req.body.team_id}, function(err, userInfo) {
+      console.log(userInfo);
       //If already exists, update it
-      if (existingLocation.length > 0) {
-        SavedLocations.findByIdAndUpdate(existingLocation[0]._id, {$set: {address: address}}, {new: true}, function(err, updated) {
-          console.log(updated);
-          res.send({
-            "text": "Location updated!"
-          });
+      if (userInfo.length > 0) {
+        var foundName=false;
+        userInfo[0].locations.forEach(function (el) {
+          if(locationName === el.name) {
+            foundName = true;
+            el.address = address;
+          }
         });
+        if(foundName) {
+          SavedLocations.findByIdAndUpdate(userInfo[0]._id, userInfo[0], {new: true}, function(err, updated) {
+            console.log(updated);
+
+            res.send({
+              "text": "Location updated!"
+            });
+          });
+        }else {
+          SavedLocations.findByIdAndUpdate(userInfo[0]._id, {$push: {locations: {name: locationName, address: address}}}, {new: true}, function(err, updated) {
+            console.log(updated);
+            res.send({
+              "text": "Location added!"
+            });
+          });
+        }
       } else { //If not, create it
+          var data = {
+            userName: req.body.user_name,
+            userId: req.body.user_id,
+            teamId: req.body.team_id,
+            channelId: req.body.channel_id,
+            locations: [{name: locationName, address: address}]
+          };
           SavedLocations.create(data, function(error, location) {
           console.log(location);
           res.send({
@@ -144,7 +175,6 @@ app.post('/save', function(req, res) {
       console.log("FAIL");
     }
 });
-
 
 app.post('/:command', function(req, res) { //add option to get geocodes? too much?
   var command = req.params.command,
