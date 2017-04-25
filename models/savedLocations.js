@@ -6,8 +6,7 @@ const locationSchema = new Schema({
 	userId: String,
 	teamId: String,
 	channelId: String,
-	name: String, 
-	address: String
+	locations: [{name: String, address: String}]
 });
 
 module.exports = mongoose.model("SavedLocations", locationSchema);
