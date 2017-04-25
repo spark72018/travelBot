@@ -41,27 +41,13 @@ var setInfo = function(str, attachment, toChannel) {
   };
 };
 
-var properSend = function(publicOrNot) {
+var sendTo = function(publicOrNot) {
   return function(param1, param2) {
     if(publicOrNot === 'all') {
       return setInfo(param1, param2, true).away();
     }else {
       return setInfo(param1, param2).away();
     }
-  }
-};
-
-var myPromise = function(fn) {
-  if(fn === 'geo') {
-    return  function(address) {
-        return googleMapsClient.geocode({address: address}).asPromise();
-      }
-  }else if(fn === 'directions') {
-    return function(obj) {
-        return googleMapsClient.directions(obj).asPromise();
-      }
-  }else {
-    console.log("myPromise only takes 'geo' or 'directions'!");
   }
 };
 
@@ -93,22 +79,70 @@ app.get('/auth', function(req, res) {
   })
 });
 
+var myPromise = function(fn) {
+  if(fn === 'geo') {
+    return  function(address) {
+        return googleMapsClient.geocode({address: address}).asPromise();
+      }
+  }else if(fn === 'directions') {
+    return function(obj) {
+        return googleMapsClient.directions(obj).asPromise();
+      }
+  }else {
+    console.log("myPromise only takes 'geo' or 'directions'!");
+  }
+};
+
 app.post('/mylocations', function(req, res) {
   //retrieve from db using Mongoose
-  console.log(req.body);
+  console.log('req.body is: ', req.body);
+  var addressBook = sendTo('private');
+  var addressText = 'Your address book: ';
   var teamID = req.body.team_id;
   var userID = req.body.user_id;
+  var addressAttachment = [];
+  /*
+    callback_id: The provided string will act as a unique identifier for the
+      collection of buttons within the attachment. It will be sent back to your
+      message button action URL with each invoked action. This field is required
+      when the attachment contains message buttons. It is key to identifying the
+      interaction you're working with.
+  */
+
+  //instantiate Address objects, make one for each address saved in the db
+  class Address {
+    constructor(alias, address, mongooseId) {
+      this.text = alias + ":" + "\n" + address;
+      this.fallback = "An error occurred!";
+      this.color = "#3AA3E3";
+      this.callback_id = "delete";
+      this.attachment_type = "default";
+      this.actions = [{
+        "name": "address",
+        "text": "Delete",
+        "type": "button",
+        "value": mongooseId
+      }];
+    }
+  }
+
   SavedLocations.find({userId: userID, teamId: teamID}, function(err, foundLoc) {
-    console.log(foundLoc);
-    var loc = foundLoc.locations;
+    console.log('foundLoc is: ', foundLoc);
+    var loc = foundLoc[0].locations; //array
+    console.log('loc is: ', loc);
         // WHEN CONSTRUCTING THE INTERACTIVE MESSAGE
           // list name and address
           // button VALUE will be mongoose id, so we can find in db
           // then delete from db using that id/value
-    res.send("SUCCESS");
+
+    loc.forEach(function(el) {
+      addressAttachment.push(new Address(el.name, el.address, el._id));
+    });
+
+    res.send(addressBook(addressText, addressAttachment));
+
   });
 });
-
 
 //Create database entry for save command
 app.post('/save', function(req, res) {
@@ -124,32 +158,23 @@ app.post('/save', function(req, res) {
   if (regex.test(address)) {
     //Check if location already exists first
     SavedLocations.find({userId: req.body.user_id, teamId: req.body.team_id}, function(err, userInfo) {
-      console.log(userInfo);
+      console.log('userInfo is', userInfo);
       //If already exists, update it
       if (userInfo.length > 0) {
-        var foundName=false;
-        userInfo[0].locations.forEach(function (el) {
+        // check each address' name to see if it matches user input, if match, update
+        userInfo[0].locations.forEach(function (el, idx, arr) {
           if(locationName === el.name) {
-            foundName = true;
-            el.address = address;
+            SavedLocations.findByIdAndUpdate(userInfo[0]._id, userInfo[0], {new: true}, function(err, updated) {
+              console.log('replaced existing', updated);
+              res.send({"text": "Location updated!"});
+            });
+          }else if(idx === arr.length - 1) { //has reached end of array, and still no match, so add address
+            SavedLocations.findByIdAndUpdate(userInfo[0]._id, {$push: {locations: {name: locationName, address: address}}}, {new: true}, function(err, updated) {
+              console.log('pushed new', updated);
+              res.send({"text": "Location added!"});
+            });
           }
         });
-        if(foundName) {
-          SavedLocations.findByIdAndUpdate(userInfo[0]._id, userInfo[0], {new: true}, function(err, updated) {
-            console.log(updated);
-
-            res.send({
-              "text": "Location updated!"
-            });
-          });
-        }else {
-          SavedLocations.findByIdAndUpdate(userInfo[0]._id, {$push: {locations: {name: locationName, address: address}}}, {new: true}, function(err, updated) {
-            console.log(updated);
-            res.send({
-              "text": "Location added!"
-            });
-          });
-        }
       } else { //If not, create it
           var data = {
             userName: req.body.user_name,
@@ -159,19 +184,17 @@ app.post('/save', function(req, res) {
             locations: [{name: locationName, address: address}]
           };
           SavedLocations.create(data, function(error, location) {
-          console.log(location);
-          res.send({
-            "text": "Location saved!",
-          });
+            console.log(location);
+            res.send({
+              "text": "Location saved!",
+            });
         });
       }
     });
 
     console.log("Success!");
   } else {
-      res.send({
-        "text": "Enter a valid address!",
-      });
+      res.send({"text": "Enter a valid address!"});
       console.log("FAIL");
     }
 });
@@ -182,7 +205,7 @@ app.post('/:command', function(req, res) { //add option to get geocodes? too muc
       splitted = input.split(">"),
       cmdSplit = command.split("_");
       regex = /\d+\s+([a-zA-Z]+|[a-zA-Z]+\s[a-zA-Z]+)/g,
-      sendAway = properSend(cmdSplit[1]),
+      sendAway = sendTo(cmdSplit[1]),
       reqObj = {};
   var helpText = "Valid commands: drive, bike, walk, transit, mapme, save.\nTo get directions (pick your mode of transport): /drive 123 N Main St > 456 S Main St\nTo get a map of a location: /mapme 123 N Main St\nTo save a location: /save home > 123 N Main St"
   console.log('commandSplit is', cmdSplit);
