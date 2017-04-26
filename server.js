@@ -33,20 +33,16 @@ var setInfo = function(str, attachment, toChannel) {
       store['response_type'] = 'in_channel';
     }
   }
-  var away = function() {
-    return store;
-  };
-  return {
-    away: away
-  };
+
+  return store;
 };
 
 var sendTo = function(publicOrNot) {
   return function(param1, param2) {
     if(publicOrNot === 'all') {
-      return setInfo(param1, param2, true).away();
+      return setInfo(param1, param2, true);
     }else {
-      return setInfo(param1, param2).away();
+      return setInfo(param1, param2);
     }
   }
 };
@@ -100,14 +96,7 @@ app.post('/mylocations', function(req, res) {
   var addressText = 'Your address book: ';
   var teamID = req.body.team_id;
   var userID = req.body.user_id;
-  var addressAttachment = [];
-  /*
-    callback_id: The provided string will act as a unique identifier for the
-      collection of buttons within the attachment. It will be sent back to your
-      message button action URL with each invoked action. This field is required
-      when the attachment contains message buttons. It is key to identifying the
-      interaction you're working with.
-  */
+  var addressAttachment;
 
   //instantiate Address objects, make one for each address saved in the db
   class Address {
@@ -135,13 +124,15 @@ app.post('/mylocations', function(req, res) {
           // button VALUE will be mongoose id, so we can find in db
           // then delete from db using that id/value
 
-    loc.forEach(function(el) {
-      addressAttachment.push(new Address(el.name, el.address, el._id));
-    });
+    addressAttachment = loc.map((savedLoc) => new Address(savedLoc.name, savedLoc.address, savedLoc._id));
 
     res.send(addressBook(addressText, addressAttachment));
 
   });
+});
+
+app.post('/button', function(req, res) {
+  console.log('button req.body is', req.body);
 });
 
 //Create database entry for save command
