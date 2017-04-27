@@ -1,26 +1,39 @@
 $(document).ready(function() {
+	function fadeDiv() {
+        $('.main-section').each(function() {
+            var bottomOfObject = $(this).position().top;
+            var bottomOfWindow = $(window).scrollTop() + $(window).height();
+            
+            //Fade in div
+            if (bottomOfWindow > bottomOfObject) {
+                $(this).animate({'opacity':'1'}, 1200);      
+            }  
+        }); 
+	}
 
-
-	// hide back-to-top first
+	//Hide back-to-top btn at first
 	$(".back-to-top").hide();
 	
-	// fade in back-to-top, background position y
 	$(window).scroll(function () {
+		//Fade in back-to-top btn
 		if ($(this).scrollTop() > 200) {
 			$('.back-to-top').fadeIn(1000);
 		} else {
 			$('.back-to-top').fadeOut();
 		}
-		//Animate background on scroll
+
+		//Animate background position y on scroll
 		$('body').css("background-position-y", parseInt($(this).scrollTop()*0.1));
+
+		//Fade div call back
+		fadeDiv();
 	});
 
-	// scroll body to 0px on click
+	//Scroll body to 0px on click
 	$('.back-to-top a').click(function () {
 		$('body, html').animate({
 			scrollTop: 0
 		}, 700);
 		return false;
 	});
-
 });
