@@ -2,6 +2,8 @@ body {
 	font-family: 'Poppins', sans-serif;
 	color: #2a313e;
 	text-align: center;
+	background-position: center top;
+    background-repeat: no-repeat;
 	background-color: #a0d9f6;
     background-attachment: fixed;
     background-size: cover;
@@ -132,7 +134,7 @@ a.add-btn:focus {
  	background-color: #de613a;
  	position: fixed;
 	bottom: 30px;
-	margin-left: 1165px;
+	margin-left: 1295px;
 }
 .back-to-top a {
 	color: #fff;
