@@ -147,6 +147,21 @@ app.post('/button', function(req, res) {
   var addressBook = sendTo('private');
   var addressText = 'Your address book: ';
   var addressAttachment;
+  class Address {
+    constructor(alias, address, mongooseId) {
+      this.text = alias + ":" + "\n" + address;
+      this.fallback = "An error occurred!";
+      this.color = "#3AA3E3";
+      this.callback_id = "delete";
+      this.attachment_type = "default";
+      this.actions = [{
+        "name": "address",
+        "text": "Delete",
+        "type": "button",
+        "value": mongooseId
+      }];
+    }
+  }
   console.log('idk is', idk);
   console.log('button value is ', idk.actions[0].value);
   SavedLocations.find({userId: idk.user.id, teamId: idk.team.id}, function(err, userInfo) {
