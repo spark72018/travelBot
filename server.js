@@ -148,7 +148,7 @@ app.post('/button', function(req, res) {
   var idk = JSON.parse(req.body.payload);
   console.log('idk is', idk);
   console.log('button value is ', idk.actions[0].value);
-  SavedLocations.find({userId: req.body.user_id, teamId: req.body.team_id}, function(err, userInfo) {
+  SavedLocations.find({userId: idk.user.id, teamId: idk.team.id}, function(err, userInfo) {
     if(err) {
       console.log('button userInfo err is', err);
     }else {
