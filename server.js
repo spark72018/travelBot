@@ -18,7 +18,11 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
 //Connect to db
-mongoose.connect(process.env.MONGOLAB_URI || "mongodb://localhost/travelBot");
+mongoose.connect(process.env.MONGOLAB_URI || "mongodb://localhost/travelBot", function(err, go) {
+  if(err) {
+    console.log('connect err is', err);
+  }
+});
 
 var setInfo = function(str, attachment, toChannel) {
   var store = {}, type, i;
@@ -91,7 +95,7 @@ var myPromise = function(fn) {
 
 app.post('/mylocations', function(req, res) {
   //retrieve from db using Mongoose
-  console.log('req.body is: ', req.body);
+  console.log('locations req.body is: ', req.body);
   var addressBook = sendTo('private');
   var addressText = 'Your address book: ';
   var teamID = req.body.team_id;
@@ -114,8 +118,11 @@ app.post('/mylocations', function(req, res) {
       }];
     }
   }
-
+  console.log('before find');
   SavedLocations.find({userId: userID, teamId: teamID}, function(err, foundLoc) {
+    if(err) {
+      console.log('mylocations err', err);
+    }
     console.log('foundLoc is: ', foundLoc);
     var loc = foundLoc[0].locations; //array
     console.log('loc is: ', loc);
@@ -128,6 +135,7 @@ app.post('/mylocations', function(req, res) {
           return match.charAt(0) + match.charAt(1).toUpperCase();
         }
       })
+    console.log('find end');
     };
 
     addressAttachment = loc.map((savedLoc) => new Address(savedLoc.name, upCaseEveryFirstLetter(savedLoc.address), savedLoc._id));
@@ -139,7 +147,13 @@ app.post('/mylocations', function(req, res) {
 
 app.post('/button', function(req, res) {
   var idk = JSON.parse(req.body.payload);
-  console.log('button req.body is', idk);
+  console.log('idk is', idk);
+  console.log('button value is ', idk.actions[0].value);
+  SavedLocations.find({userId: req.body.user_id, teamId: req.body.team_id}, function(err, userInfo) {
+    if(err) {
+      console.log('userInfo err is', err);
+    }
+  });
 });
 
 //Create database entry for save command
@@ -156,6 +170,9 @@ app.post('/save', function(req, res) {
   if (regex.test(address)) {
     //Check if location already exists first
     SavedLocations.find({userId: req.body.user_id, teamId: req.body.team_id}, function(err, userInfo) {
+      if(err) {
+        console.log('userInfo err is', err);
+      }
       console.log('userInfo is', userInfo);
       //If already exists, update it
       if (userInfo.length > 0) {
