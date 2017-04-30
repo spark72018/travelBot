@@ -153,7 +153,7 @@ app.post('/button', function(req, res) {
     if(err) {
       console.log('userInfo err is', err);
     }else {
-      console.log(userInfo);
+      console.log('userInfo is', userInfo);
     }
   });
 });
