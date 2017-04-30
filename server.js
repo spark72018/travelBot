@@ -132,7 +132,8 @@ app.post('/mylocations', function(req, res) {
 });
 
 app.post('/button', function(req, res) {
-  console.log('button req.body is', req.body);
+  var idk = JSON.parse(req.body.payload);
+  console.log('button req.body is', idk);
 });
 
 //Create database entry for save command
