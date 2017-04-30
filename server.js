@@ -150,9 +150,9 @@ app.post('/button', function(req, res) {
   console.log('button value is ', idk.actions[0].value);
   SavedLocations.find({userId: req.body.user_id, teamId: req.body.team_id}, function(err, userInfo) {
     if(err) {
-      console.log('userInfo err is', err);
+      console.log('button userInfo err is', err);
     }else {
-      console.log('userInfo is', userInfo);
+      console.log('button userInfo is', userInfo);
     }
   });
 });
