@@ -13,6 +13,7 @@ body {
 	margin: 0;
 }
 .landing {
+	height: 100vh;
 	padding: 200px 0;
 }
 .logo-header {
@@ -135,7 +136,7 @@ a.add-btn:focus {
  	background-color: #de613a;
  	position: fixed;
 	bottom: 30px;
-	margin-left: 1295px;
+	right: 30px;
 }
 .back-to-top a {
 	color: #fff;
