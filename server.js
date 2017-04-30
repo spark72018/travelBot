@@ -159,7 +159,7 @@ app.post('/button', function(req, res) {
         }else {
           console.log(updated.locations);
           addressAttachment = updated.locations.map((savedLoc) => new Address(savedLoc.name, savedLoc.address, savedLoc._id));
-          res.send({addressBook(addressText, addressAttachment));
+          res.send(addressBook(addressText, addressAttachment));
         }
 
       });
