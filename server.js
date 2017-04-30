@@ -118,7 +118,6 @@ app.post('/mylocations', function(req, res) {
       }];
     }
   }
-  console.log('before find');
   SavedLocations.find({userId: userID, teamId: teamID}, function(err, foundLoc) {
     if(err) {
       console.log('mylocations err', err);
@@ -134,7 +133,6 @@ app.post('/mylocations', function(req, res) {
           return match.charAt(0) + match.charAt(1).toUpperCase();
         }
       })
-    console.log('find end');
     };
 
     addressAttachment = loc.map((savedLoc) => new Address(savedLoc.name, upCaseEveryFirstLetter(savedLoc.address), savedLoc._id));
@@ -146,6 +144,7 @@ app.post('/mylocations', function(req, res) {
 
 app.post('/button', function(req, res) {
   var idk = JSON.parse(req.body.payload);
+  var addressBook = sendTo('private');
   console.log('idk is', idk);
   console.log('button value is ', idk.actions[0].value);
   SavedLocations.find({userId: idk.user.id, teamId: idk.team.id}, function(err, userInfo) {
@@ -156,6 +155,7 @@ app.post('/button', function(req, res) {
         if(err) {
           console.log(err);
         }else {
+          console.log(updated);
           res.send({"text": "deleted!"});
         }
 
