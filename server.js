@@ -152,7 +152,9 @@ app.post('/button', function(req, res) {
     if(err) {
       console.log('button userInfo err is', err);
     }else {
-      console.log('button userInfo is', userInfo);
+      SavedLocations.findByIdAndUpdate(userInfo[0]._id, {$pull: {locations: {_id: idk.actions[0].value}}}, function(err updated) {
+        console.log('worked!');
+      });
     }
   });
 });
