@@ -145,6 +145,8 @@ app.post('/mylocations', function(req, res) {
 app.post('/button', function(req, res) {
   var idk = JSON.parse(req.body.payload);
   var addressBook = sendTo('private');
+  var addressText = 'Your address book: ';
+  var addressAttachment;
   console.log('idk is', idk);
   console.log('button value is ', idk.actions[0].value);
   SavedLocations.find({userId: idk.user.id, teamId: idk.team.id}, function(err, userInfo) {
@@ -155,8 +157,9 @@ app.post('/button', function(req, res) {
         if(err) {
           console.log(err);
         }else {
-          console.log(updated);
-          res.send({"text": "deleted!"});
+          console.log(updated.locations);
+          addressAttachment = updated.locations.map((savedLoc) => new Address(savedLoc.name, savedLoc.address, savedLoc._id));
+          res.send({addressBook(addressText, addressAttachment));
         }
 
       });
