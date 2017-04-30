@@ -155,8 +155,10 @@ app.post('/button', function(req, res) {
       SavedLocations.findByIdAndUpdate(userInfo[0]._id, {$pull: {locations: {_id: idk.actions[0].value}}}, {new: true}, function(err, updated) {
         if(err) {
           console.log(err);
+        }else {
+          res.send({"text": "deleted!"});
         }
-        console.log('worked!');
+
       });
     }
   });
