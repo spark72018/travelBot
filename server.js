@@ -152,6 +152,8 @@ app.post('/button', function(req, res) {
   SavedLocations.find({userId: req.body.user_id, teamId: req.body.team_id}, function(err, userInfo) {
     if(err) {
       console.log('userInfo err is', err);
+    }else {
+      console.log(userInfo);
     }
   });
 });
