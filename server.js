@@ -122,8 +122,8 @@ app.post('/mylocations', function(req, res) {
     var regex = /^[a-z]|\s[a-z]/g;
     var upCaseEveryFirstLetter = function(str) {
       return str.replace(regex, function(match) {
-        if(match.charAt(0) !== " ") {
-          return match.charAt(0).toUpperCase();
+        if(match !== " ") {
+          return match.toUpperCase();
         }else {
           return match.charAt(0) + match.charAt(1).toUpperCase();
         }
