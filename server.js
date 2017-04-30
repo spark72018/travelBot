@@ -123,7 +123,6 @@ app.post('/mylocations', function(req, res) {
     if(err) {
       console.log('mylocations err', err);
     }
-    console.log('foundLoc is: ', foundLoc);
     var loc = foundLoc[0].locations; //array
     console.log('loc is: ', loc);
     var regex = /^[a-z]|\s[a-z]/g;
