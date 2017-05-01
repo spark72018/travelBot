@@ -37,7 +37,6 @@ var setInfo = function(str, attachment, toChannel) {
       store['response_type'] = 'in_channel';
     }
   }
-
   return store;
 };
 
@@ -93,16 +92,7 @@ var myPromise = function(fn) {
   }
 };
 
-app.post('/mylocations', function(req, res) {
-  //retrieve from db using Mongoose
-  console.log('locations req.body is: ', req.body);
-  var addressBook = sendTo('private');
-  var addressText = 'Your address book: ';
-  var teamID = req.body.team_id;
-  var userID = req.body.user_id;
-  var addressAttachment;
-
-  //instantiate Address objects, make one for each address saved in the db
+var addressMod = (function() {
   class Address {
     constructor(alias, address, mongooseId) {
       this.text = alias + ":" + "\n" + address;
@@ -118,50 +108,55 @@ app.post('/mylocations', function(req, res) {
       }];
     }
   }
+  var upCaseRegEx = /^[a-z]|\s[a-z]/g;
+  var capEveryFirstLetter = function(str) {
+    return str.replace(upCaseRegEx, function(match) {
+      if(match !== " ") {
+        return match.toUpperCase();
+      }else {
+        return match.charAt(0) + match.charAt(1).toUpperCase();
+      }
+    })
+  };
+  var makeAddress = (addressName, addressStr, dbId) =>
+        new Address(addressName, capEveryFirstLetter(addressStr), dbId)
+
+  var addressBookText = "Your address book: ";
+
+  return {
+    addressBookText: addressBookText,
+    makeAddress: makeAddress
+  };
+})();
+
+app.post('/mylocations', function(req, res) {
+  //retrieve from db using Mongoose
+  console.log('locations req.body is: ', req.body);
+  var a = addressMod;
+  var addressBook = sendTo('private');
+  var teamID = req.body.team_id;
+  var userID = req.body.user_id;
+  var addressAttachment;
+
   SavedLocations.find({userId: userID, teamId: teamID}, function(err, foundLoc) {
     if(err) {
       console.log('mylocations err', err);
     }
     var loc = foundLoc[0].locations; //array
     console.log('loc is: ', loc);
-    var regex = /^[a-z]|\s[a-z]/g;
-    var upCaseEveryFirstLetter = function(str) {
-      return str.replace(regex, function(match) {
-        if(match !== " ") {
-          return match.toUpperCase();
-        }else {
-          return match.charAt(0) + match.charAt(1).toUpperCase();
-        }
-      })
-    };
 
-    addressAttachment = loc.map((savedLoc) => new Address(savedLoc.name, upCaseEveryFirstLetter(savedLoc.address), savedLoc._id));
+    addressAttachment = loc.map((savedLoc) =>
+      a.makeAddress(savedLoc.name, savedLoc.address, savedLoc._id));
 
-    res.send(addressBook(addressText, addressAttachment));
-
+    res.send(addressBook(a.addressBookText, addressAttachment));
   });
 });
 
 app.post('/button', function(req, res) {
   var idk = JSON.parse(req.body.payload);
   var addressBook = sendTo('private');
-  var addressText = 'Your address book: ';
   var addressAttachment;
-  class Address {
-    constructor(alias, address, mongooseId) {
-      this.text = alias + ":" + "\n" + address;
-      this.fallback = "An error occurred!";
-      this.color = "#3AA3E3";
-      this.callback_id = "delete";
-      this.attachment_type = "default";
-      this.actions = [{
-        "name": "address",
-        "text": "Delete",
-        "type": "button",
-        "value": mongooseId
-      }];
-    }
-  }
+
   console.log('idk is', idk);
   console.log('button value is ', idk.actions[0].value);
   SavedLocations.find({userId: idk.user.id, teamId: idk.team.id}, function(err, userInfo) {
@@ -172,8 +167,8 @@ app.post('/button', function(req, res) {
         if(err) {
           console.log(err);
         }else {
-          console.log(updated.locations);
           addressAttachment = updated.locations.map((savedLoc) => new Address(savedLoc.name, savedLoc.address, savedLoc._id));
+          console.log('deletion success!');
           res.send(addressBook(addressText, addressAttachment));
         }
 
