@@ -109,7 +109,7 @@ var addressMod = (function() {
     }
   }
   var upCaseRegEx = /^[a-z]|\s[a-z]/g;
-  var capEveryFirstLetter = function(str) {
+  var format = function(str) {
     return str.replace(upCaseRegEx, function(match) {
       if(match !== " ") {
         return match.toUpperCase();
@@ -119,7 +119,7 @@ var addressMod = (function() {
     })
   };
   var makeAddress = (addressName, addressStr, dbId) =>
-        new Address(addressName, capEveryFirstLetter(addressStr), dbId)
+        new Address(addressName, format(addressStr), dbId)
 
   var addressBookText = "Your address book: ";
 
@@ -130,7 +130,6 @@ var addressMod = (function() {
 })();
 
 app.post('/mylocations', function(req, res) {
-  //retrieve from db using Mongoose
   console.log('locations req.body is: ', req.body);
   var a = addressMod;
   var addressBook = sendTo('private');
@@ -138,13 +137,18 @@ app.post('/mylocations', function(req, res) {
   var userID = req.body.user_id;
   var addressAttachment;
 
+  // retrieve from db using Mongoose
   SavedLocations.find({userId: userID, teamId: teamID}, function(err, foundLoc) {
     if(err) {
       console.log('mylocations err', err);
+      return;
     }
-    var loc = foundLoc[0].locations; //array
-    console.log('loc is: ', loc);
+    // array of user's locations
+    var loc = foundLoc[0].locations;
+    //console.log('loc is: ', loc);
 
+    // make slack attachment array elements by instantiating
+    // addressMod's Address class on each saved entry
     addressAttachment = loc.map((savedLoc) =>
       a.makeAddress(savedLoc.name, savedLoc.address, savedLoc._id));
 
@@ -152,13 +156,15 @@ app.post('/mylocations', function(req, res) {
   });
 });
 
+// button to delete address and receive an updated address book
 app.post('/button', function(req, res) {
+  var a = addressMod;
   var idk = JSON.parse(req.body.payload);
   var addressBook = sendTo('private');
   var addressAttachment;
 
-  console.log('idk is', idk);
-  console.log('button value is ', idk.actions[0].value);
+  //console.log('idk is', idk);
+  //console.log('button value is ', idk.actions[0].value);
   SavedLocations.find({userId: idk.user.id, teamId: idk.team.id}, function(err, userInfo) {
     if(err) {
       console.log('button userInfo err is', err);
@@ -167,11 +173,11 @@ app.post('/button', function(req, res) {
         if(err) {
           console.log(err);
         }else {
-          addressAttachment = updated.locations.map((savedLoc) => new Address(savedLoc.name, savedLoc.address, savedLoc._id));
-          console.log('deletion success!');
+          addressAttachment = updated.locations.map((savedLoc) =>
+            a.makeAddress(savedLoc.name, savedLoc.address, savedLoc._id));
+          //console.log('deletion success!');
           res.send(addressBook(addressText, addressAttachment));
         }
-
       });
     }
   });
@@ -204,7 +210,7 @@ app.post('/save', function(req, res) {
               console.log('replaced existing', updated);
               res.send({"text": "Location updated!"});
             });
-          }else if(idx === arr.length - 1) { //has reached end of array, and still no match, so add address
+          }else if(idx === arr.length - 1) { // has reached end of array, and still no match, so add address
             SavedLocations.findByIdAndUpdate(userInfo[0]._id, {$push: {locations: {name: locationName, address: address}}}, {new: true}, function(err, updated) {
               console.log('pushed new', updated);
               res.send({"text": "Location added!"});
@@ -235,7 +241,7 @@ app.post('/save', function(req, res) {
     }
 });
 
-app.post('/:command', function(req, res) { //add option to get geocodes? too much?
+app.post('/:command', function(req, res) { // add option to get geocodes? too much?
   var command = req.params.command,
       input = req.body.text,
       splitted = input.split(">"),
