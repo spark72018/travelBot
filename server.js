@@ -176,7 +176,7 @@ app.post('/button', function(req, res) {
           addressAttachment = updated.locations.map((savedLoc) =>
             a.makeAddress(savedLoc.name, savedLoc.address, savedLoc._id));
           //console.log('deletion success!');
-          res.send(addressBook(addressText, addressAttachment));
+          res.send(addressBook(a.addressBookText, addressAttachment));
         }
       });
     }
