@@ -266,27 +266,29 @@ app.post('/:command', function(req, res) { // add option to get geocodes? too mu
       console.log(found[0].locations);
       found[0].locations.forEach(function(entry) {
         if(splitted[0].trim().toLowerCase() === entry.name) {
-          console.log('first address matched!');
-          start = Promise.resolve(entry.geo);
+          console.log('first address in db!');
+          start = entry.address;
           startIsProper = true;
         }else if(splitted[1].trim().toLowerCase() === entry.name) {
-          console.log('second address matched!');
-          finish = Promise.resolve(entry.geo);
+          console.log('second address in db!');
+          finish = entry.address;
           finishIsProper = true;
         }else if(!startIsProper) {
           if(regex.test(splitted[0])) {
+            start = splitted[0];
+            console.log('first address is valid address!');
             startIsProper = true;
           }
         }else if(!finishIsProper) {
           if(regex.test(splitted[1])) {
-            console.log('second address tested true');
+            console.log('second address is valid address!');
+            finish = splitted[1];
             finishIsProper = true;
           }
         }
       });
     }
-    console.log('startIsProper is', startIsProper);
-    console.log('finishIsProper is', finishIsProper);
+
     if (startIsProper && finishIsProper) {
         //  /mapme will send post request to homepage/image
       if(cmdSplit[0] === "image") {
