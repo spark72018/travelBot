@@ -70,7 +70,7 @@ a.add-btn:focus {
 	background-color: #fff;
 }
 .main h3 {
-	margin-top: 0;
+	margin-top: 15px;
 	margin-bottom: 15px;
 	text-align: left;
 	font-size: 30px;
@@ -157,8 +157,28 @@ a.add-btn:focus {
 }
 
 /* Media queries */
-@media (max-width: 767px) {
+@media (max-width: 992px) {
+	.main-section img {
+		margin: 0 auto;
+	}
+}
+@media (max-width: 768px) {
+	.logo-img {
+		float: none;
+	}
+	.logo-img,
+	.logo-header h1 {
+		display: block;
+	}
 	.description {
 		display: block;
+	}
+	.main-section img {
+		margin: 0 auto;
+	}
+}
+@media (max-width: 320px) {
+	.landing {
+		padding: 80px 0;
 	}
 }

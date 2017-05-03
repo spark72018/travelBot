@@ -28,7 +28,7 @@ $(document).ready(function() {
 	
 	$(window).scroll(function () {
 		//Fade in back-to-top btn when scroll 200px down 
-		if ($(this).scrollTop() > 200) {
+		if ($(this).scrollTop() > 200 && $(this).width() > 992) {
 			$(".back-to-top").fadeIn(1000);
 		} else {
 			$(".back-to-top").fadeOut();
