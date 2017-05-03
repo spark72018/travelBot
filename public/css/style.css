@@ -47,14 +47,14 @@ body {
     display: inline-block;
     line-height: 50px;
     text-decoration: none;
-    background-color: #de613a;
+    background-color: #f9754c;
     border-radius: 3px;
     color: #fff;
     box-shadow: 2px 3px 13px #787e7c;
     transition: background-color .4s;
 }
 .add-btn:hover {
-	background-color: #f9754c;
+	background-color: #de613a;
 }
 a.add-btn:hover,
 a.add-btn:visited,
@@ -135,7 +135,7 @@ a.add-btn:focus {
 	height: 60px;
  	border-radius: 50%;
  	padding: 3px;
- 	background-color: #de613a;
+ 	background-color: #f9754c;
  	position: fixed;
 	bottom: 30px;
 	right: 30px;
