@@ -310,10 +310,10 @@ app.post('/:command', function(req, res) { // add option to get geocodes? too mu
               reqObj = {},
               poly;
           if(!start) {
-            start = myPromise('geo')(splitted[0]);
+            start = myPromise('geo')(start);
           }
           if(!finish) {
-            finish = myPromise('geo')(splitted[0]);
+            finish = myPromise('geo')(finish);
           }
 
           var geoCodeGate = Promise.all([start, finish]);
