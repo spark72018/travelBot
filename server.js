@@ -308,8 +308,8 @@ app.post('/:command', function(req, res) { // add option to get geocodes? too mu
           ];
           res.send(sendAway(attachObj));
         }else { //if user uses /mapme with two addresses, send static image with polyline and markers
-          var formattedAddress1 = splitted[0].trim().replace(/\s/g, '+'),
-              formattedAddress2 = splitted[1].trim().replace(/\s/g, '+'),
+          var formattedAddress1 = start.trim().replace(/\s/g, '+'),
+              formattedAddress2 = finish.trim().replace(/\s/g, '+'),
               reqObj = {},
               poly;
 
