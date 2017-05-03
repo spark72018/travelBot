@@ -268,10 +268,12 @@ app.post('/:command', function(req, res) { // add option to get geocodes? too mu
         if(splitted[0].trim().toLowerCase() === entry.name) {
           console.log('first address in db!');
           start = entry.address;
+          console.log('start entry.address is', entry.address);
           startIsProper = true;
         }else if(splitted[1].trim().toLowerCase() === entry.name) {
           console.log('second address in db!');
           finish = entry.address;
+          console.log('finish entry.address is', entry.address);
           finishIsProper = true;
         }else if(!startIsProper) {
           if(regex.test(splitted[0])) {
@@ -292,6 +294,7 @@ app.post('/:command', function(req, res) { // add option to get geocodes? too mu
     if (startIsProper && finishIsProper) {
         //  /mapme will send post request to homepage/image
       if(cmdSplit[0] === "image") {
+        console.log('image block');
         if(splitted.length === 1) {
           var formattedInput = input.replace(/\s/g, '+');
           console.log('formattedInput = ' + formattedInput);
@@ -319,7 +322,7 @@ app.post('/:command', function(req, res) { // add option to get geocodes? too mu
           var geoCodeGate = Promise.all([start, finish]);
 
           geoCodeGate.then(function(geo) {
-            console.log(geo[0], geo[1]);
+            console.log('geos are', geo[0], geo[1]);
             reqObj.departure_time = new Date;
             reqObj.traffic_model = 'best_guess';
             reqObj.origin = geo[0].json.results[0].geometry.location;
