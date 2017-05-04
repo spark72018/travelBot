@@ -33,7 +33,7 @@ var setInfo = function(str, attachment, toChannel) {
       store['text'] = arguments[i];
     }else if(type === 'object') {
       store['attachments'] = arguments[i];
-    }else if(arguments[i] == true) {
+    }else if(arguments[i] === true) {
       store['response_type'] = 'in_channel';
     }
   }
@@ -145,7 +145,7 @@ app.post('/mylocations', function(req, res) {
     }
     // array of user's locations
     var loc = foundLoc[0].locations;
-    //console.log('loc is: ', loc);
+    console.log(`Locations for ${req.body.user_name} in db are ${loc}`);
 
     // make slack attachment array elements by instantiating
     // addressMod's Address class on each saved entry
@@ -188,8 +188,8 @@ app.post('/button', function(req, res) {
 //Create database entry for save command
 app.post('/save', function(req, res) {
   var split = req.body.text.split(" > ");
-  var locationName = split[0].toLowerCase();
-  var address = split[1].toLowerCase();
+  var locationName = split[0].trim().toLowerCase();
+  var address = split[1].trim().toLowerCase();
   var regex = /\d+\s+([a-zA-Z]+|[a-zA-Z]+\s[a-zA-Z]+)/g;
 
   console.log("location name = " + locationName);
@@ -263,7 +263,7 @@ app.post('/:command', function(req, res) { // add option to get geocodes? too mu
     if(err) {
       console.log('command SavedLocations.find error is', err);
     }else {
-      console.log(found[0].locations);
+      console.log('locations are (:command block)', found[0].locations);
       found[0].locations.forEach(function(entry) {
         if(splitted[0].trim().toLowerCase() === entry.name) {
           console.log('first address in db!');
@@ -313,7 +313,7 @@ app.post('/:command', function(req, res) { // add option to get geocodes? too mu
               reqObj = {},
               poly;
 
-          var geoCodeGate = Promise.all([myPromise('geo')(start), finish = myPromise('geo')(finish)]);
+          var geoCodeGate = Promise.all([myPromise('geo')(start), myPromise('geo')(finish)]);
 
           geoCodeGate.then(function(geo) {
             console.log('geos are', geo[0], geo[1]);
@@ -380,7 +380,7 @@ app.post('/:command', function(req, res) { // add option to get geocodes? too mu
                 durationText,
                 resultString;
 
-            if(route.steps.length > 20) {
+            if(route.steps.length > 30) {
               var redirectUrl ='Directions were too long! Just so we don\'t spam your channel, here\'s a directions link: ' + '\n\n' +
               'https://www.google.com/maps/dir/' +
               splitted[0].trim().replace(/\s/g, '+') + '/' +
@@ -396,17 +396,6 @@ app.post('/:command', function(req, res) { // add option to get geocodes? too mu
             }
 
             resultString = distanceText + durationText;
-
-            if(cmdSplit.length === 2 && cmdSplit[1] === 'eta') {
-              res.send(sendAway(resultString));
-            }else{
-              route.steps.forEach(function(el) {
-                resultString += el.html_instructions
-                                .replace(/<b>|<\/b>|<\/div>/g, '')
-                                .replace(/<div (.*?)>/g, '\n') + '\n';
-              });
-              res.send(sendAway(resultString));
-            }
           });
         });
       }
