@@ -12,7 +12,7 @@ body {
 /* SVG intro animation*/
 .compass-arrow {
 	transform-origin: center;
-	animation: wiggle 4s infinite ease-in;
+	animation: wiggle 3.5s infinite ease-in;
 	animation-delay: 1s;
 }
 @keyframes wiggle {
@@ -157,9 +157,14 @@ a.add-btn:focus {
  	position: fixed;
 	bottom: 30px;
 	right: 30px;
+	box-shadow: 2px 1px 13px rgba(104, 107, 106, 0.85); /* Opacity for when its over the black footer*/
+	transition: background-color .4s;
 }
 .back-to-top a {
 	color: #fff;
+}
+.back-to-top:hover {
+	background-color: #de613a;
 }
 .back-to-top a:hover,
 .back-to-top a:focus {
