@@ -131,10 +131,10 @@ a.add-btn:focus {
 	padding: 60px;
 }
 .back-to-top {
-	width: 60px;
-	height: 60px;
+	width: 50px;
+	height: 50px;
  	border-radius: 50%;
- 	padding: 3px;
+ 	padding: 7px;
  	background-color: #f9754c;
  	position: fixed;
 	bottom: 30px;
