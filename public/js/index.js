@@ -1,4 +1,5 @@
 $(document).ready(function() {
+
 	//Hide back-to-top btn at first
 	$(".back-to-top").hide();
 
@@ -40,4 +41,5 @@ $(document).ready(function() {
 		//Fade in divs on scroll
 		fadeDiv();
 	});
+	
 });
