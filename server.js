@@ -229,7 +229,7 @@ app.post('/save', function(req, res) {
             userId: req.body.user_id,
             teamId: req.body.team_id,
             channelId: req.body.channel_id,
-            locations: [{name: locationName, address: address, geo: geocode}]
+            locations: [{name: locationName, address: address}]
           };
           SavedLocations.create(data, function(error, location) {
             console.log(location);
