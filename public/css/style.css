@@ -12,17 +12,23 @@ body {
 /* SVG intro animation*/
 .compass-arrow {
 	transform-origin: center;
-	animation: wiggle 3.5s infinite ease-in;
-	animation-delay: 1s;
+	animation: wiggle 3.5s infinite linear;
+	animation-delay: 1.5s;
 }
 @keyframes wiggle {
 	0%, 10% {
 		transform: rotate(0deg);
 	}
 	10%, 20% {
-		transform: rotate(-75deg);
+		transform: rotate(-40deg);
 	}
-	20%, 100% {
+	20%, 30% {
+		transform: rotate(-15deg);
+	}
+	30%, 40% {
+		transform: rotate(-25deg);
+	}
+	40%, 100% {
 		transform: rotate(0deg);
 	}
 }
@@ -32,7 +38,7 @@ body {
 }
 .landing {
 	height: 100vh;
-	padding: 190px 0;
+	padding: 170px 0;
 }
 .landing h4 {
 	margin-bottom: 40px;
@@ -153,7 +159,7 @@ a.add-btn:focus {
 	height: 50px;
  	border-radius: 50%;
  	padding: 7px;
- 	background-color: #f9754c;
+ 	background-color: #e88161;
  	position: fixed;
 	bottom: 30px;
 	right: 30px;
@@ -199,9 +205,15 @@ a.add-btn:focus {
 	.main-section img {
 		margin: 0 auto;
 	}
+	.main p {
+		font-size: 15px;
+	}
 }
 @media (max-width: 320px) {
 	.landing {
-		padding: 80px 0;
+		padding: 60px 0;
+	}
+	.main p {
+		font-size: 11px;
 	}
 }
