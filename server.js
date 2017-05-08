@@ -206,6 +206,7 @@ app.post('/save', function(req, res) {
       //If already exists, update it
       if (userInfo.length > 0) {
         // check each address' name to see if it matches user input, if match, update
+        console.log(userInfo[0].locations);
         userInfo[0].locations.forEach(function (el, idx, arr) {
           if(locationName === el.name) {
             SavedLocations.findByIdAndUpdate(userInfo[0]._id, userInfo[0], {new: true}, function(err, updated) {
@@ -229,7 +230,7 @@ app.post('/save', function(req, res) {
             userId: req.body.user_id,
             teamId: req.body.team_id,
             channelId: req.body.channel_id,
-            locations: [{name: locationName, address: address, geo: geocode}]
+            locations: [{name: locationName, address: address}]
           };
           SavedLocations.create(data, function(error, location) {
             console.log(location);
