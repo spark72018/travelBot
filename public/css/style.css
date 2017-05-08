@@ -13,22 +13,25 @@ body {
 /* SVG intro animation*/
 .compass-arrow {
 	transform-origin: center;
-	animation: wiggle 3s infinite linear 1.5s;
+	animation: wiggle 5s infinite linear 1.5s;
 }
 @keyframes wiggle {
 	0%, 10% {
 		transform: rotate(0deg);
 	}
 	10%, 20% {
-		transform: rotate(-40deg);
+		transform: rotate(-720deg);
 	}
 	20%, 30% {
-		transform: rotate(-5deg);
+		transform: rotate(-720deg);
 	}
-	30%, 40% {
-		transform: rotate(-25deg);
+	30%, 33% {
+		transform: rotate(0deg);
 	}
-	40%, 100% {
+	33%, 60% {
+		transform: rotate(15deg);
+	}
+	60%, 100% {
 		transform: rotate(0deg);
 	}
 }
