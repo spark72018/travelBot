@@ -204,7 +204,7 @@ app.post('/save', function(req, res) {
       }
       console.log('userInfo is', userInfo);
       //If already exists, update it
-      if (userInfo.length > 0) {
+      if (userInfo.length > 0 && userInfo[0].locations.length > 0) {
         // check each address' name to see if it matches user input, if match, update
         console.log(userInfo[0].locations);
         userInfo[0].locations.forEach(function (el, idx, arr) {
@@ -224,7 +224,16 @@ app.post('/save', function(req, res) {
             });
           }
         });
-      } else { //If not, create it
+      }else if(userInfo.length > 0 && userInfo[0].locations.length === 0) {
+        SavedLocations.findByIdAndUpdate(userInfo[0]._id, {$push: {locations: {name: locationName, address: address}}}, {new: true}, function(err, updated) {
+          if(err) {
+            console.log(err);
+            return;
+          }
+          console.log('pushed new', updated);
+          res.send({"text": "Location added!"});
+        });
+      }else { //If not, create it
           var data = {
             userName: req.body.user_name,
             userId: req.body.user_id,
@@ -265,50 +274,64 @@ app.post('/:command', function(req, res) { // add option to get geocodes? too mu
       console.log('command SavedLocations.find error is', err);
     }else {
       console.log('locations are (:command block)', found[0].locations);
-      found[0].locations.forEach(function(entry) {
-        if(splitted[0].trim().toLowerCase() === entry.name) {
-          console.log('first address in db!');
-          start = entry.address;
-          console.log('start entry.address is', entry.address);
-          startIsProper = true;
-        }else if(splitted[1].trim().toLowerCase() === entry.name) {
-          console.log('second address in db!');
-          finish = entry.address;
-          console.log('finish entry.address is', entry.address);
-          finishIsProper = true;
-        }else if(!startIsProper) {
-          if(regex.test(splitted[0])) {
-            start = splitted[0];
-            console.log('first address is valid address!');
+      if(found[0].locations.length > 0) {
+        found[0].locations.forEach(function(entry) {
+          if(splitted[0].trim().toLowerCase() === entry.name) {
+            console.log('first address in db!');
+            start = entry.address;
+            console.log('start entry.address is', entry.address);
             startIsProper = true;
-          }
-        }else if(!finishIsProper) {
-          if(regex.test(splitted[1])) {
-            console.log('second address is valid address!');
-            finish = splitted[1];
+          }else if(splitted[1].trim().toLowerCase() === entry.name) {
+            console.log('second address in db!');
+            finish = entry.address;
+            console.log('finish entry.address is', entry.address);
             finishIsProper = true;
-          }
-        }
-      });
-    }
-
-    if (startIsProper && finishIsProper) {
-        //  /mapme will send post request to homepage/image
-      if(cmdSplit[0] === "image") {
-        console.log('image block');
-        if(splitted.length === 1) {
-          var formattedInput = input.replace(/\s/g, '+');
-          console.log('formattedInput = ' + formattedInput);
-          var url = "https://maps.googleapis.com/maps/api/staticmap?center="+formattedInput+"&size=600x400&markers="+formattedInput;
-          var attachObj = [
-            {
-              "title": input,
-              "title_link": "http://maps.google.com/maps?f=d&source=s_d&saddr=&daddr="+formattedInput,
-              image_url: url
+          }else if(!startIsProper) {
+            if(regex.test(splitted[0])) {
+              start = splitted[0];
+              console.log('first address is valid address!');
+              startIsProper = true;
             }
-          ];
-          res.send(sendAway(attachObj));
-        }else { //if user uses /mapme with two addresses, send static image with polyline and markers
+          }else if(!finishIsProper) {
+            if(regex.test(splitted[1])) {
+              console.log('second address is valid address!');
+              finish = splitted[1];
+              finishIsProper = true;
+            }
+          }
+        });
+      }else {
+        if(regex.test(splitted[0])) {
+          start = splitted[0];
+          console.log('first address is valid address!');
+          startIsProper = true;
+        }
+        if(regex.test(splitted[1])) {
+          console.log('second address is valid address!');
+          finish = splitted[1];
+          finishIsProper = true;
+        }
+
+      }
+    }
+    if(cmdSplit[0] === "image" && startIsProper && splitted.length ===1) {
+      if(splitted.length === 1) {
+        var formattedInput = input.replace(/\s/g, '+');
+        console.log('formattedInput = ' + formattedInput);
+        var url = "https://maps.googleapis.com/maps/api/staticmap?center="+formattedInput+"&size=600x400&markers="+formattedInput;
+        var attachObj = [
+          {
+            "title": input,
+            "title_link": "http://maps.google.com/maps?f=d&source=s_d&saddr=&daddr="+formattedInput,
+            image_url: url
+          }
+        ];
+        res.send(sendAway(attachObj));
+      }
+    }
+    console.log(startIsProper, finishIsProper);
+    if (startIsProper && finishIsProper) {
+          //if user uses /mapme with two addresses, send static image with polyline and markers
           var formattedAddress1 = start.trim().replace(/\s/g, '+'),
               formattedAddress2 = finish.trim().replace(/\s/g, '+'),
               reqObj = {},
@@ -342,7 +365,7 @@ app.post('/:command', function(req, res) { // add option to get geocodes? too mu
               res.send(sendAway(attachObj));
             });
           });
-        }
+
       } else if (splitted.length === 2) {
         //timestamp console.log to easily discern app startup in logs
         console.log('driving ', startIsProper, finishIsProper);
@@ -399,10 +422,9 @@ app.post('/:command', function(req, res) { // add option to get geocodes? too mu
             resultString = distanceText + durationText;
           });
         });
+      }else { //Error message if input doesn't pass regex test
+          res.send(sendAway('Enter a valid address!'));
       }
-    } else { //Error message if input doesn't pass regex test
-        res.send(sendAway('Enter a valid address!'));
-    }
   });
   //Help command
   if (cmdSplit[0] === "help") {
