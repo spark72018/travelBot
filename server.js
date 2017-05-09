@@ -165,8 +165,10 @@ var addressMod = (function() {
   /**
    * @function makeAddress
    * @description instantiates an Address class with formatted address string
-   * @param { string } { string } { string }
-   * @returns { object }
+   * @param { string } name of saved address
+   * @param { string } address string
+   * @param { string } unique database id assigned to entry
+   * @returns { object } instantiated Address object 
   */
   var makeAddress = (addressName, addressStr, dbId) =>
         new Address(addressName, format(addressStr), dbId)
