@@ -23,7 +23,6 @@ mongoose.connect(process.env.MONGOLAB_URI || "mongodb://localhost/travelBot", fu
     console.log('connect err is', err);
   }
 });
-
 var setInfo = function(str, attachment, toChannel) {
   var store = {}, type, i;
 
@@ -37,6 +36,7 @@ var setInfo = function(str, attachment, toChannel) {
       store['response_type'] = 'in_channel';
     }
   }
+  console.log('setInfo called, store is', store);
   return store;
 };
 
@@ -78,7 +78,7 @@ app.get('/auth', function(req, res) {
   })
 });
 
-var myPromise = function(fn) {
+var retrieve = function(fn) {
   if(fn === 'geo') {
     return  function(address) {
         return googleMapsClient.geocode({address: address}).asPromise();
@@ -88,7 +88,7 @@ var myPromise = function(fn) {
         return googleMapsClient.directions(obj).asPromise();
       }
   }else {
-    console.log("myPromise only takes 'geo' or 'directions'!");
+    console.log("retrieve fn only takes 'geo' or 'directions'!");
   }
 };
 
@@ -257,19 +257,146 @@ app.post('/save', function(req, res) {
 app.post('/:command', function(req, res) {
   var command = req.params.command,
       input = req.body.text,
-      splitted = input.split(">"),
+      addressSplit = input.split(">"),
+      addressSplitLength = addressSplit.length,
       cmdSplit = command.split("_"),
       regex = /\d+\s+([a-zA-Z]+|[a-zA-Z]+\s[a-zA-Z]+)/g,
       sendAway = sendTo(cmdSplit[1]),
       reqObj = {},
       start,
       finish,
-      startIsProper = false,
-      finishIsProper = false;
-      console.log('splitted is', splitted);
+      startIsValid = false,
+      finishIsValid = false;
+  console.log('addressSplit is', addressSplit);
   var helpText = "Valid commands: drive, bike, walk, transit, mapme, save.\nTo get directions (pick your mode of transport): /drive 123 N Main St > 456 S Main St\nTo get a map of a location: /mapme 123 N Main St\nTo save a location: /save home > 123 N Main St"
   console.log('commandSplit is', cmdSplit);
-  
+  SavedLocations.find({userId: req.body.user_id, teamId: req.body.team_id}, function(err, found) {
+    if(err) {
+      return console.log('command SavedLocations.find error is', err);
+    }
+    if(found[0].locations.length > 0) {
+      found[0].locations.forEach(function(entry) {
+        if(addressSplit[0].trim().toLowerCase() === entry.name) {
+          console.log('first address in db!');
+          start = entry.address;
+          console.log('start entry.address is', entry.address);
+          startIsValid = true;
+        }
+        if(addressSplit[1]) { // if there's a second address, check in db
+        console.log('second address detected');
+          if(addressSplit[1].trim().toLowerCase() === entry.name) {
+            console.log('second address in db!');
+            finish = entry.address;
+            console.log('finish entry.address is', entry.address);
+            finishIsValid = true;
+          }
+        }
+      });
+    }
+    if(!startIsValid) {
+      if(regex.test(addressSplit[0])) {
+        start = addressSplit[0];
+        console.log('first address is valid address!');
+        startIsValid = true;
+      }
+    }
+    if(!finishIsValid) {
+      console.log('in !finishisValid block');
+      console.log(regex.test(addressSplit[1]));
+      if(regex.test(addressSplit[1])) {
+        console.log('second address is valid address!');
+        finish = addressSplit[1];
+        finishIsValid = true;
+      }
+    }
+    console.log('startIsValid is', startIsValid);
+    console.log('endIsValid is', finishIsValid);
+    if(addressSplitLength === 2 && startIsValid && finishIsValid) {
+      let startGeo = retrieve('geo')(start);
+      let endGeo = retrieve('geo')(finish)
+      var geoCodes = Promise.all([startGeo, endGeo]);
+
+      geoCodes.then((geos) => {
+        console.log('geos are', geos[0], geos[1]);
+
+        reqObj.departure_time = new Date;
+        reqObj.traffic_model = 'best_guess';
+        reqObj.origin = geos[0].json.results[0].geometry.location;
+        reqObj.destination = geos[1].json.results[0].geometry.location;
+        if(cmdSplit[0] !== 'image') {
+          reqObj.mode = cmdSplit[0];
+        }
+
+        let directions = retrieve('directions')(reqObj);
+        directions.then((result) => {
+          if(cmdSplit[0] === 'image') {
+            console.log('image command');
+            let poly = result.json.routes[0].overview_polyline.points;
+            var urlFormatAddress1 = start.trim().replace(/\s/g, '+'),
+                urlFormatAddress2 = finish.trim().replace(/\s/g, '+');
+            var url = "https://maps.googleapis.com/maps/api/staticmap?size=600x400&markers="+
+            urlFormatAddress1 + '|' + urlFormatAddress2 +
+            '&path=weight:6%7Ccolor:blue%7Cenc:' + poly;
+            var attachObj = [
+              {
+                "title": input,
+                "title_link": "https://www.google.com/maps/dir/" + urlFormatAddress1 + '/' + urlFormatAddress2,
+                image_url: url
+              }
+            ];
+            console.log('attachObj is', attachObj);
+            res.send(sendAway(attachObj));
+          }else {
+            let route = result.json.routes[0].legs[0],
+            distanceText = 'Distance: ' + route.distance.text + '\n',
+            durationText,
+            resultString;
+
+            if(route.steps.length > 40) {
+              var redirectUrl ='Directions were too long! Just so we don\'t spam your channel, here\'s a directions link: ' + '\n\n' +
+              'https://www.google.com/maps/dir/' +
+              addressSplit[0].trim().replace(/\s/g, '+') + '/' +
+              addressSplit[1].trim().replace(/\s/g, '+');
+
+              res.send(sendAway(redirectUrl));
+            }
+
+            if(cmdSplit[0] === 'driving') {
+              durationText = 'ETA: ' + route.duration_in_traffic.text + ' (in current traffic)' + '\n\n';
+            }else {
+              durationText = 'ETA: ' + route.duration.text + '\n\n';
+            }
+            resultString = distanceText + durationText;
+
+            route.steps.forEach(function(el) {
+              resultString += el.html_instructions
+                                .replace(/<b>|<\/b>|<\/div>/g, '')
+                                .replace(/<div (.*?)>/g, '\n') + '\n';
+            });
+            console.log(resultString);
+            res.send(sendAway(resultString));
+          }
+        })
+      })
+    }else { // onlly one address
+      console.log('addressSplit is', addressSplit);
+      console.log('else block for one address');
+      if(cmdSplit[0] === 'image') {
+        console.log('in image block for one address');
+        var formattedInput = addressSplit[0].replace(/\s/g, '+');
+        console.log('formattedInput = ' + formattedInput);
+        var url = "https://maps.googleapis.com/maps/api/staticmap?center="+formattedInput+"&size=600x400&markers="+formattedInput;
+        var attachObj = [
+          {
+            "title": input,
+            "title_link": "http://maps.google.com/maps?f=d&source=s_d&saddr=&daddr="+formattedInput,
+            image_url: url
+          }
+        ];
+        res.send(sendAway(attachObj));
+      }
+    }
+  });
   //Help command
   if (cmdSplit[0] === "help") {
     res.send(sendAway(helpText));
