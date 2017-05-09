@@ -29,7 +29,7 @@ mongoose.connect(process.env.MONGOLAB_URI || "mongodb://localhost/travelBot", fu
  * @description sets Slack response text, attachments, and public/private response
  * @param { string } text of the message
  * @param { object } any attachments (images, etc)
- * @param { boolean } if true send to public, otherwise private
+ * @param { boolean } coerce to true if send to public, otherwise private
  * @returns { object } response object that will be sent to Slack
  */
 var setInfo = function(str, attachment, toChannel) {
@@ -247,6 +247,9 @@ app.post('/button', function(req, res) {
 // Create database entry for save command
 app.post('/save', function(req, res) {
   var split = req.body.text.split(" > ");
+  if(split.length < 2) {
+    return res.send({"text": "Please separate name and address with '>'."});
+  }
   var locationName = split[0].trim().toLowerCase();
   var address = split[1].trim().toLowerCase();
   var regex = /\d+\s+([a-zA-Z]+|[a-zA-Z]+\s[a-zA-Z]+)/g;
@@ -311,7 +314,7 @@ app.post('/save', function(req, res) {
     console.log("Success!");
     } else {
         res.send({"text": "Enter a valid address!"});
-        console.log("FAIL");
+        //console.log("FAIL");
       }
 });
 
@@ -379,12 +382,19 @@ app.post('/:command', function(req, res) {
         finishIsValid = true;
       }
     }
+    if(!startIsValid && !finishIsValid) {
+      return res.send({'text': 'Neither address could be found in address book or validated.'});
+    }else if(!startIsValid && finishIsValid) {
+      return res.send({'text': 'First address could not be found in address book or validated'});
+    }else if(startIsValid && !finishIsValid) {
+      return res.send({'text': 'Second address could not be found in address book or validated.'});
+    }
     console.log('startIsValid is', startIsValid);
     console.log('endIsValid is', finishIsValid);
     // if two valid addresses are detected, get geocodes and directions via Promises
     if(addressSplitLength === 2 && startIsValid && finishIsValid) {
       let startGeo = retrieve('geo')(start);
-      let endGeo = retrieve('geo')(finish)
+      let endGeo = retrieve('geo')(finish);
       var geoCodes = Promise.all([startGeo, endGeo]); // Promise gate
 
       geoCodes.then((geos) => {
