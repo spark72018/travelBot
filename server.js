@@ -168,7 +168,7 @@ var addressMod = (function() {
    * @param { string } name of saved address
    * @param { string } address string
    * @param { string } unique database id assigned to entry
-   * @returns { object } instantiated Address object 
+   * @returns { object } instantiated Address object
   */
   var makeAddress = (addressName, addressStr, dbId) =>
         new Address(addressName, format(addressStr), dbId)
@@ -437,6 +437,8 @@ app.post('/:command', function(req, res) {
             }
             resultString = distanceText + durationText;
 
+            // iterate over directions array and construct Slack response string while
+            // taking out all html tags 
             route.steps.forEach(function(el) {
               resultString += el.html_instructions
                                 .replace(/<b>|<\/b>|<\/div>/g, '')
