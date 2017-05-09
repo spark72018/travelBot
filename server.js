@@ -29,7 +29,7 @@ mongoose.connect(process.env.MONGOLAB_URI || "mongodb://localhost/travelBot", fu
  * @description sets Slack response text, attachments, and public/private response
  * @param { string } text of the message
  * @param { object } any attachments (images, etc)
- * @param { boolean } coerce to true if send to public, otherwise private
+ * @param { string } coerce to boolean, if true send to public, otherwise private
  * @returns { object } response object that will be sent to Slack
  */
 var setInfo = function(str, attachment, toChannel) {
@@ -194,19 +194,22 @@ app.post('/mylocations', function(req, res) {
   // search db using Mongoose
   SavedLocations.find({userId: userID, teamId: teamID}, function(err, foundLoc) {
     if(err) {
-      console.log('mylocations err', err);
-      return;
+      return console.log('mylocations err', err);
     }
     // array of user's locations
     var loc = foundLoc[0].locations;
-    console.log(`Locations for ${req.body.user_name} in db are ${loc}`);
+    if(loc.length > 0) {
+      console.log(`Locations for ${req.body.user_name} in db are ${loc}`);
 
-    // make slack attachment array elements by instantiating
-    // addressMod's Address class on each saved entry
-    addressAttachment = loc.map((savedLoc) =>
-      a.makeAddress(savedLoc.name, savedLoc.address, savedLoc._id));
+      // make slack attachment array elements by instantiating
+      // addressMod's Address class on each saved entry
+      addressAttachment = loc.map((savedLoc) =>
+        a.makeAddress(savedLoc.name, savedLoc.address, savedLoc._id));
 
-    res.send(addressBook(a.addressBookText, addressAttachment));
+      res.send(addressBook(a.addressBookText, addressAttachment));
+    }else {
+      res.send({"text": "You currently have no saved addresses!"});
+    }
   });
 });
 
@@ -438,7 +441,7 @@ app.post('/:command', function(req, res) {
             resultString = distanceText + durationText;
 
             // iterate over directions array and construct Slack response string while
-            // taking out all html tags 
+            // taking out all html tags
             route.steps.forEach(function(el) {
               resultString += el.html_instructions
                                 .replace(/<b>|<\/b>|<\/div>/g, '')
