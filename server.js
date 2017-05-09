@@ -29,7 +29,7 @@ mongoose.connect(process.env.MONGOLAB_URI || "mongodb://localhost/travelBot", fu
  * @description sets Slack response text, attachments, and public/private response
  * @param { string } text of the message
  * @param { object } any attachments (images, etc)
- * @param { string } coerce to boolean, if true send to public, otherwise private
+ * @param { boolean } if true send to public, otherwise private
  * @returns { object } response object that will be sent to Slack
  */
 var setInfo = function(str, attachment, toChannel) {
