@@ -20,10 +20,10 @@ body {
 		transform: rotate(0deg);
 	}
 	10%, 20% {
-		transform: rotate(-720deg);
+		transform: rotate(-1060deg);
 	}
 	20%, 30% {
-		transform: rotate(-720deg);
+		transform: rotate(-1060deg);
 	}
 	30%, 33% {
 		transform: rotate(0deg);
