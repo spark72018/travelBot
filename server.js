@@ -410,23 +410,24 @@ app.post('/:command', function(req, res) {
 
         let directions = retrieve('directions')(reqObj);
         directions.then((result) => {
-          // if /mapme invoked, will construct static image polyline map url
+          // construct static image polyline map url regardless of whether
+          // /mapme or not, according to Google Maps API Terms of Service
+          var poly = result.json.routes[0].overview_polyline.points;
+          var urlFormatAddress1 = start.trim().replace(/\s/g, '+'),
+              urlFormatAddress2 = finish.trim().replace(/\s/g, '+');
+          var url = "https://maps.googleapis.com/maps/api/staticmap?size=600x400&markers="+
+          urlFormatAddress1 + '|' + urlFormatAddress2 +
+          '&path=weight:6%7Ccolor:blue%7Cenc:' + poly + "&key=" + apiKey;
+          var attachObj = [
+            {
+              "title": a.format(input.replace(">", "to")),
+              "title_link": "https://www.google.com/maps/dir/" + urlFormatAddress1 + '/' + urlFormatAddress2,
+              "image_url": url
+            }
+          ];
+          console.log('attachObj is', attachObj);
           if(cmdSplit[0] === 'image') {
             console.log('image command');
-            let poly = result.json.routes[0].overview_polyline.points;
-            var urlFormatAddress1 = start.trim().replace(/\s/g, '+'),
-                urlFormatAddress2 = finish.trim().replace(/\s/g, '+');
-            var url = "https://maps.googleapis.com/maps/api/staticmap?size=600x400&markers="+
-            urlFormatAddress1 + '|' + urlFormatAddress2 +
-            '&path=weight:6%7Ccolor:blue%7Cenc:' + poly + "&key=" + apiKey;
-            var attachObj = [
-              {
-                "title": a.format(input.replace(">", "to")),
-                "title_link": "https://www.google.com/maps/dir/" + urlFormatAddress1 + '/' + urlFormatAddress2,
-                "image_url": url
-              }
-            ];
-            console.log('attachObj is', attachObj);
             res.send(sendAway(attachObj));
           }else { // not /mapme, so must be one of four directions commands
             let route = result.json.routes[0].legs[0],
@@ -458,7 +459,7 @@ app.post('/:command', function(req, res) {
                                 .replace(/<div (.*?)>/g, '\n') + '\n';
             });
             console.log(resultString);
-            res.send(sendAway(resultString));
+            res.send(sendAway(resultString, attachObj));
           }
         })
       })
