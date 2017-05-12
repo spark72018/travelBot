@@ -382,15 +382,21 @@ app.post('/:command', function(req, res) {
         finishIsValid = true;
       }
     }
-    if(!startIsValid && !finishIsValid) {
-      return res.send({'text': 'Neither address could be found in address book or validated.'});
-    }else if(!startIsValid && finishIsValid) {
-      return res.send({'text': 'First address could not be found in address book or validated'});
-    }else if(startIsValid && !finishIsValid) {
-      return res.send({'text': 'Second address could not be found in address book or validated.'});
-    }
+    if(addressSplitLength === 2) {
+      if(!startIsValid && !finishIsValid) {
+        return res.send({'text': 'Neither address could be found in address book or validated.'});
+      }else if(!startIsValid && finishIsValid) {
+        return res.send({'text': 'First address could not be found in address book or validated'});
+      }else if(startIsValid && !finishIsValid) {
+        return res.send({'text': 'Second address could not be found in address book or validated.'});
+      }
     console.log('startIsValid is', startIsValid);
     console.log('endIsValid is', finishIsValid);
+    }else {
+      if(!startIsValid) {
+        return res.send({'text': 'Address could not be found in address book or validated'});
+      }
+    }
     // if two valid addresses are detected, get geocodes and directions via Promises
     if(addressSplitLength === 2 && startIsValid && finishIsValid) {
       let startGeo = retrieve('geo')(start);
@@ -398,7 +404,8 @@ app.post('/:command', function(req, res) {
       var geoCodes = Promise.all([startGeo, endGeo]); // Promise gate
 
       geoCodes.then((geos) => {
-        console.log('geos are', geos[0], geos[1]);
+        console.log('first geo is', geos[0].json.results[0]);
+        console.log('second geo is', geos[1].json.results[0]);
 
         reqObj.departure_time = new Date;
         reqObj.traffic_model = 'best_guess';
@@ -410,6 +417,7 @@ app.post('/:command', function(req, res) {
 
         let directions = retrieve('directions')(reqObj);
         directions.then((result) => {
+          console.log('directions result is', result.json.routes);
           // construct static image polyline map url regardless of whether
           // /mapme or not, according to Google Maps API Terms of Service
           var poly = result.json.routes[0].overview_polyline.points;
