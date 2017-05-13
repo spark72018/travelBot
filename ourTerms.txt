@@ -1,0 +1,44 @@
+Terms of Service
+
+Please read these terms and conditions of use carefully before using the
+NavBuddy service. By accessing or utilizing NavBuddy, you are also agreeing to
+be bound by Google's Maps APIs Terms of Service which can be found here:
+
+https://developers.google.com/maps/terms
+
+Google Privacy Policy:
+
+https://www.google.com/policies/privacy/
+
+********************************************************************************
+
+General Rules:
+
+NavBuddy is accessible to the general public without charge and does not require
+a fee-based subscription or other fee-based restricted access. This applies to
+all NavBuddy functionalities and Maps API Implementations within NavBuddy.
+
+********************************************************************************
+
+Privacy Policy:
+
+NavBuddy does not allow any party to gain access to information about users,
+including personally identifiable information (such as user names), or
+non-personally identifiable usage information (such as saved addresses or
+geocode coordinates). NavBuddy neither requests nor retains any information
+regarding end user devices (mobile, tablet, laptop, desktop, etc).
+
+  Geolocation privacy:
+
+  NavBuddy has access to the user's Slack information (such as channel,
+  username, userID, etc) when approved via Slack's OAuthentication process. This
+  information is purely for /mylocations and /save commands in order to properly
+  identify a user.
+
+  A location's geocode coordinates are only looked up when users invoke the
+  appropriate slash command (/drive, /bike, /walk, /transit, and /mapme). This
+  data does NOT enable Google to identify an individual user, and is not stored
+  or cached within the database. 
+
+  NavBuddy is incapable of obtaining the user's location or using it with other
+  data providers.
